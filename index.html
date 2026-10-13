@@ -39,7 +39,6 @@ main{flex:1;padding:4px 14px 210px}
 .tile .ck{position:absolute;top:6px;right:6px;width:26px;height:26px;border-radius:50%;background:var(--olive);color:#fff;display:none;align-items:center;justify-content:center;font-size:15px;border:2px solid #fff}
 .tile.on{border-color:var(--olive);outline:2px solid var(--olive)}
 .tile.on .ck{display:flex}
-.tile .always{position:absolute;top:6px;left:6px;background:var(--amber);color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:8px}
 .c-veg{background:#EAF1DE}.c-meat{background:#F7E1DA}.c-fish{background:#DDEBF0}.c-dairy{background:#F8F0DA}.c-grains{background:#F4E9D2}.c-legumes{background:#EFE3D6}.c-herbs{background:#E2EEDC}.c-pantry{background:#EFE9DD}
 #actionBar{position:fixed;left:50%;transform:translateX(-50%);bottom:84px;width:100%;max-width:560px;padding:0 12px;z-index:6}
 .abar{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:10px 10px 10px 14px;box-shadow:0 4px 18px rgba(60,50,30,.15)}
@@ -103,7 +102,7 @@ h2.sec.terra{color:var(--terra)}
 .ilist li:last-child{border-bottom:0}
 .ilist .q{margin-left:auto;font-weight:600;white-space:nowrap;font-size:14px}
 .dot{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;flex:none}
-.dot.y{background:var(--olive)}.dot.n{background:var(--terra)}.dot.s{background:var(--amber)}
+.dot.b{background:#B9B0A0}.dot.y{background:var(--olive)}.dot.n{background:var(--terra)}.dot.s{background:var(--amber)}
 .steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
 .steps li{display:flex;gap:10px;padding:12px;background:var(--card);border:1px solid var(--line);border-radius:14px}
 .steps li.done{opacity:.5}
@@ -133,11 +132,18 @@ h2.sec.terra{color:var(--terra)}
 .sw::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.2s}
 .sw.on{background:var(--olive)}
 .sw.on::after{left:21px}
-#sheet{position:fixed;inset:0;background:rgba(30,25,15,.4);display:none;z-index:20;align-items:flex-end;justify-content:center}
-#sheet.show{display:flex}
-.sheetbox{background:var(--cream);width:100%;max-width:560px;border-radius:20px 20px 0 0;padding:16px 16px 24px;max-height:75vh;overflow:auto}
-.selchips{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
-.selchip{display:inline-flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:6px 10px;font-size:14px}
+.ingbox{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:10px 12px;box-shadow:var(--shadow);margin:4px 0 12px}
+.ibhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:14px}
+.ibhead .del{font-size:13px}
+.ingbox textarea{width:100%;border:1px solid var(--line);border-radius:12px;padding:10px 12px;font:inherit;font-size:16px;background:#FFFEFA;outline:0;resize:none;min-height:56px;color:var(--text)}
+.ingbox textarea:focus{border-color:var(--olive)}
+.sugg,.parsed{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.sugg:empty,.parsed:empty{display:none}
+.sg{background:var(--olive-lt);color:var(--olive-dk);border-radius:16px;padding:6px 11px;font-size:13.5px;font-weight:600}
+.pchip{display:inline-flex;align-items:center;gap:4px;border-radius:14px;padding:4px 9px;font-size:12.5px}
+.pchip.ok{background:#EEF3E5;color:var(--olive-dk)}
+.pchip.bad{background:var(--terra-lt);color:#8E3A1E}
+.pchip small{color:var(--muted)}
 #toast{position:fixed;left:50%;bottom:150px;transform:translateX(-50%);background:#2E2A24;color:#fff;padding:10px 16px;border-radius:20px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .25s;z-index:30;max-width:90%;text-align:center}
 #toast.show{opacity:1}
 @media (min-width:480px){.grid{grid-template-columns:repeat(4,1fr)}}
@@ -159,12 +165,11 @@ h2.sec.terra{color:var(--terra)}
     <div class="credit">Created by: Michael Gerontides &middot; v<span id="ver"></span></div>
   </nav>
 </div>
-<div id="sheet"></div>
 <div id="toast"></div>
 
 <script>
 "use strict";
-const VERSION = "1.0";
+const VERSION = "1.4";
 
 /* ---------- Storage (browser only, on this device) ---------- */
 const LS = {
@@ -174,16 +179,16 @@ const LS = {
 
 /* ---------- Texts ---------- */
 const T = {
-  el:{tag:"Τι να μαγειρέψω με ό,τι έχω;",search:"Αναζήτηση υλικού…",all:"Όλα",myIng:"Τα υλικά μου",find:"Βρες συνταγές",hintPick:"Διάλεξε ό,τι έχεις στο σπίτι",
+  el:{tag:"Τι να μαγειρέψω με ό,τι έχω;",ph:"Γράψε τα υλικά σου με κόμμα: ντομάτα, αυγά, feta, kotopoulo…",notRec:"δεν αναγνωρίστηκε",hintType:"Γράψε ή πάτησε τα υλικά σου",otherG:"Με κάποια από τα υλικά σου",ideasG:"Άλλες ιδέες",fewRes:"Λίγες συνταγές ταιριάζουν με τις ρυθμίσεις σου (διατροφή, αλλεργιογόνα, χρόνος, φούρνος).",typeFirst:"Γράψε ή διάλεξε τα υλικά σου για να δεις συνταγές.",search:"Αναζήτηση υλικού…",all:"Όλα",myIng:"Τα υλικά μου",find:"Βρες συνταγές",hintPick:"Διάλεξε ό,τι έχεις στο σπίτι",
     navIng:"Υλικά",navRec:"Συνταγές",navSaved:"Αποθηκευμένες",navShop:"Τι να αγοράσω",navSet:"Ρυθμίσεις",always:"πάντα",alwaysToast:"Τα βασικά αλλάζουν από τις Ρυθμίσεις",
     noMatchSearch:"Δεν βρέθηκε υλικό",clearAll:"Καθαρισμός όλων",close:"Κλείσιμο",selectedNone:"Δεν έχεις επιλέξει υλικά ακόμη.",
     best:"Η καλύτερη επιλογή",another:"Άλλη ιδέα",view:"Συνταγή",save:"Αποθήκευση",saved:"Αποθηκεύτηκε",cookNow:"Μαγείρεψε τώρα",almost:"Σχεδόν έτοιμο",missing:"Λείπει",match:"ταίριασμα",
     withIng:"Με τα υλικά σου",edit:"Αλλαγή",noRes:"Δεν βρέθηκε συνταγή με αυτά τα υλικά.",noResHint:"Πρόσθεσε ένα βασικό υλικό, π.χ. αυγά, ζυμαρικά, ρύζι ή ντομάτα.",pickFirst:"Διάλεξε πρώτα τα υλικά σου.",
-    haveAll:"Έχεις όλα τα υλικά",usesN:n=>"Χρησιμοποιεί "+n+" από τα υλικά σου",quick:m=>"Έτοιμο σε "+m+" λεπτά",greek:"Παραδοσιακή ελληνική συνταγή",subUsed:"Με αντικατάσταση υλικού",
+    haveAll:"Έχεις όλα τα κύρια υλικά",usesN:n=>"Χρησιμοποιεί "+n+" από τα υλικά σου",quick:m=>"Έτοιμο σε "+m+" λεπτά",greek:"Παραδοσιακή ελληνική συνταγή",subUsed:"Με αντικατάσταση υλικού",
     min:"λεπτά",total:"Συνολικός χρόνος",diff:"Δυσκολία",serv:"Μερίδες",d1:"Εύκολη",d2:"Μέτρια",d3:"Δύσκολη",kcal:"kcal/μερίδα",
     tIng:"Υλικά",tSteps:"Βήματα",tNut:"Διατροφή",opt:"προαιρετικό",have:"Το έχεις",subst:"Αντικατάσταση με",addMissing:"Πρόσθεσε όσα λείπουν στη λίστα",added:"Προστέθηκαν στη λίστα",nothingMissing:"Δεν λείπει τίποτα",
     heat0:"Χωρίς φωτιά",heatL:"Χαμηλή φωτιά",heatM:"Μέτρια φωτιά",heatH:"Δυνατή φωτιά",oven:"Φούρνος",parallel:"ταυτόχρονα",
-    soak:h=>"Χρειάζεται μούλιασμα "+h+" ωρών από πριν (δεν περιλαμβάνεται στον χρόνο)",scaled:"Οι ποσότητες στο κείμενο των βημάτων αφορούν τις αρχικές μερίδες.",
+    soak:h=>"Χρειάζεται μούλιασμα "+h+" ωρών από πριν (δεν περιλαμβάνεται στον χρόνο)",
     nutTitle:"Διατροφική αξία ανά μερίδα",nutNote:"Εκτίμηση από τα υλικά της συνταγής. Δεν αντικαθιστά επαγγελματική διατροφική συμβουλή.",
     n0:"Ενέργεια",n1:"Πρωτεΐνη",n2:"Υδατάνθρακες",n3:"Λιπαρά",n4:"Φυτικές ίνες",n5:"Αλάτι",allergens:"Αλλεργιογόνα",noAllergens:"Κανένα από τα βασικά αλλεργιογόνα",
     read:"Ανάγνωση",stop:"Διακοπή",cooked:"Το μαγείρεψα",cookedT:"Καταγράφηκε. Δεν θα προτείνεται πρώτο για 7 ημέρες.",back:"Πίσω",
@@ -192,17 +197,17 @@ const T = {
     setTitle:"Ρυθμίσεις",language:"Γλώσσα",diet:"Διατροφή",dNone:"Όλα",dVeg:"Χορτοφαγικό",dVegan:"Vegan",dLent:"Νηστίσιμο",allerg:"Να αποκλειστούν αλλεργιογόνα",time:"Μέγιστος χρόνος",any:"Χωρίς όριο",
     equip:"Εξοπλισμός",ovenHave:"Έχω φούρνο",staples:"Βασικά που έχω πάντα",about:"Σχετικά",resetAll:"Διαγραφή όλων των δεδομένων",resetQ:"Να διαγραφούν όλα τα δεδομένα αυτής της συσκευής;",
     localNote:"Όλα τα δεδομένα αποθηκεύονται μόνο σε αυτή τη συσκευή. Αν καθαρίσεις τα δεδομένα του browser, θα χαθούν.",
-    vegan:"Vegan",vegetarian:"Χορτοφαγικό",lenten:"Νηστίσιμο",pcs:"τεμ.",omit:"παράλειψέ το για τη διατροφή σου"},
-  en:{tag:"What can I cook with what I have?",search:"Search ingredient…",all:"All",myIng:"My ingredients",find:"Find recipes",hintPick:"Pick what you have at home",
+    vegan:"Vegan",vegetarian:"Χορτοφαγικό",lenten:"Νηστίσιμο",pcs:"τεμ.",omit:"παράλειψέ το για τη διατροφή σου",basic:"βασικό, δεν επηρεάζει το ταίριασμα",relaxedG:"Εκτός των ρυθμίσεών σου",relaxedN:"Δεν βρέθηκαν αρκετές συνταγές μέσα στον χρόνο ή χωρίς φούρνο, όπως όρισες. Αυτές ταιριάζουν στη διατροφή και στα αλλεργιογόνα σου.",overTime:m=>"⏱ "+m+" λεπτά, πάνω από το όριό σου",needsOven:"♨ χρειάζεται φούρνο",needsSoak:"💧 θέλει μούλιασμα",noHard:"Καμία συνταγή δεν ταιριάζει με τη διατροφή και τα αλλεργιογόνα που όρισες. Άλλαξε τις Ρυθμίσεις."},
+  en:{tag:"What can I cook with what I have?",ph:"Type your ingredients with commas: tomato, eggs, φέτα, kotopoulo…",notRec:"not recognised",hintType:"Type or tap your ingredients",otherG:"With some of your ingredients",ideasG:"More ideas",fewRes:"Few recipes fit your settings (diet, allergens, time, oven).",typeFirst:"Type or pick your ingredients to see recipes.",search:"Search ingredient…",all:"All",myIng:"My ingredients",find:"Find recipes",hintPick:"Pick what you have at home",
     navIng:"Ingredients",navRec:"Recipes",navSaved:"Saved",navShop:"What to buy",navSet:"Settings",always:"always",alwaysToast:"Basics are changed in Settings",
     noMatchSearch:"No ingredient found",clearAll:"Clear all",close:"Close",selectedNone:"You have not selected any ingredients yet.",
     best:"Best choice",another:"Another idea",view:"Recipe",save:"Save",saved:"Saved",cookNow:"Cook now",almost:"Almost ready",missing:"Missing",match:"match",
     withIng:"With your ingredients",edit:"Change",noRes:"No recipe found with these ingredients.",noResHint:"Add a main ingredient, e.g. eggs, pasta, rice or tomato.",pickFirst:"Pick your ingredients first.",
-    haveAll:"You have all the ingredients",usesN:n=>"Uses "+n+" of your ingredients",quick:m=>"Ready in "+m+" minutes",greek:"Traditional Greek recipe",subUsed:"With an ingredient swap",
+    haveAll:"You have all the main ingredients",usesN:n=>"Uses "+n+" of your ingredients",quick:m=>"Ready in "+m+" minutes",greek:"Traditional Greek recipe",subUsed:"With an ingredient swap",
     min:"min",total:"Total time",diff:"Difficulty",serv:"Servings",d1:"Easy",d2:"Medium",d3:"Hard",kcal:"kcal/serving",
     tIng:"Ingredients",tSteps:"Steps",tNut:"Nutrition",opt:"optional",have:"You have it",subst:"Swap with",addMissing:"Add missing items to the list",added:"Added to the list",nothingMissing:"Nothing is missing",
     heat0:"No heat",heatL:"Low heat",heatM:"Medium heat",heatH:"High heat",oven:"Oven",parallel:"at the same time",
-    soak:h=>"Needs soaking for "+h+" hours beforehand (not included in the time)",scaled:"Quantities written inside the steps refer to the original servings.",
+    soak:h=>"Needs soaking for "+h+" hours beforehand (not included in the time)",
     nutTitle:"Nutrition per serving",nutNote:"Estimated from the recipe ingredients. Not a substitute for professional dietary advice.",
     n0:"Energy",n1:"Protein",n2:"Carbohydrates",n3:"Fat",n4:"Fibre",n5:"Salt",allergens:"Allergens",noAllergens:"None of the main allergens",
     read:"Read aloud",stop:"Stop",cooked:"I cooked this",cookedT:"Noted. It will not be suggested first for 7 days.",back:"Back",
@@ -211,9 +216,9 @@ const T = {
     setTitle:"Settings",language:"Language",diet:"Diet",dNone:"All",dVeg:"Vegetarian",dVegan:"Vegan",dLent:"Lenten (fasting)",allerg:"Exclude allergens",time:"Maximum time",any:"No limit",
     equip:"Equipment",ovenHave:"I have an oven",staples:"Basics I always have",about:"About",resetAll:"Delete all data",resetQ:"Delete all data on this device?",
     localNote:"All data is stored only on this device. Clearing the browser data will delete it.",
-    vegan:"Vegan",vegetarian:"Vegetarian",lenten:"Lenten",pcs:"pcs",omit:"leave it out for your diet"}
+    vegan:"Vegan",vegetarian:"Vegetarian",lenten:"Lenten",pcs:"pcs",omit:"leave it out for your diet",basic:"basic, does not affect the match",relaxedG:"Outside your settings",relaxedN:"Not enough recipes fit your time limit or no-oven setting. These still respect your diet and allergens.",overTime:m=>"⏱ "+m+" min, over your limit",needsOven:"♨ needs an oven",needsSoak:"💧 needs soaking",noHard:"No recipe fits your diet and allergen settings. Please change Settings."}
 };
-const ALG = {gluten:{el:"Γλουτένη",en:"Gluten"},milk:{el:"Γάλα",en:"Milk"},egg:{el:"Αυγά",en:"Eggs"},fish:{el:"Ψάρι",en:"Fish"},crust:{el:"Οστρακοειδή",en:"Shellfish"},celery:{el:"Σέλινο",en:"Celery"}};
+const ALG = {gluten:{el:"Γλουτένη",en:"Gluten"},milk:{el:"Γάλα",en:"Milk"},egg:{el:"Αυγά",en:"Eggs"},fish:{el:"Ψάρι",en:"Fish"},crust:{el:"Οστρακοειδή",en:"Shellfish"},mollusc:{el:"Μαλάκια",en:"Molluscs"},celery:{el:"Σέλινο",en:"Celery"}};
 
 /* ---------- Categories ---------- */
 const CATS = [
@@ -251,9 +256,9 @@ I("tuna","fish","Τόνος (κονσέρβα)","Canned tuna","🥫",[198,29,0,8
 I("cod","fish","Μπακαλιάρος","Cod","🐟",[82,18,0,.7,0,.15],{an:"fish",alg:["fish"],al:["bakaliaros","ψαρι","fish"]});
 I("shrimp","fish","Γαρίδες","Shrimp","🦐",[85,20,0,.5,0,.5],{an:"shell",alg:["crust"],al:["garides","prawns"]});
 I("eggs","dairy","Αυγά","Eggs","🥚",[143,12.6,.7,9.5,0,.36],{pw:60,an:"egg",alg:["egg"],al:["αυγο","avga","egg"]});
-I("feta","dairy","Φέτα","Feta","🧀",[264,14.2,4.1,21.3,0,2.8],{an:"dairy",alg:["milk"],al:["feta","τυρι"]});
+I("feta","dairy","Φέτα","Feta","🧀",[264,14.2,4.1,21.3,0,2.8],{an:"dairy",alg:["milk"],al:["τυρι","tyri","tiri","cheese"]});
 I("yogurt","dairy","Γιαούρτι","Yogurt","🥛",[73,10,3.6,2,0,.1],{an:"dairy",alg:["milk"],al:["giaourti","yoghurt"]});
-I("cheese_hard","dairy","Κεφαλοτύρι / γραβιέρα","Hard cheese","🧀",[392,28,.5,31,0,2.5],{an:"dairy",alg:["milk"],al:["κεφαλοτυρι","γραβιερα","kefalotyri","graviera","τυρι"]});
+I("cheese_hard","dairy","Κεφαλοτύρι / γραβιέρα","Hard cheese","🧀",[392,28,.5,31,0,2.5],{an:"dairy",alg:["milk"],al:["κεφαλοτυρι","γραβιερα","kefalotyri","graviera","parmesan"]});
 I("rice","grains","Ρύζι","Rice","🍚",[360,6.6,79,.6,1.3,0],{al:["ryzi","rizi"]});
 I("orzo","grains","Κριθαράκι","Orzo","🌾",[357,12.5,72,1.5,3,0],{alg:["gluten"],al:["kritharaki"]});
 I("pasta","grains","Μακαρόνια","Pasta","🍝",[357,12.5,72,1.5,3,0],{alg:["gluten"],al:["ζυμαρικα","makaronia","spaghetti","σπαγγετι"]});
@@ -278,10 +283,80 @@ I("canned_tomato","pantry","Ντομάτα κονσέρβα","Canned tomatoes","
 I("vinegar","pantry","Ξίδι","Vinegar","🍶",[18,0,.04,0,0,0],{dens:1,al:["xidi"]});
 I("olives","pantry","Ελιές","Olives","🫒",[230,1.6,6,23,3,4],{al:["elies","kalamata"]});
 I("water","pantry","Νερό","Water","💧",[0,0,0,0,0,0],{hidden:true});
+I("cabbage","veg","Λάχανο","Cabbage","🥬",[25,1.3,5.8,.1,2.5,.05],{pw:1000,al:["lahano","laxano","λαχανο λευκο","white cabbage"]});
+I("cauliflower","veg","Κουνουπίδι","Cauliflower","🥦",[25,1.9,5,.3,2,.08],{pw:800,al:["kounoupidi","kounoupidia","κουνουπιδια"]});
+I("leek","veg","Πράσο","Leek","🌱",[61,1.5,14,.3,1.8,.05],{pw:200,al:["πρασα","praso","prasa","leeks"]});
+I("okra","veg","Μπάμιες","Okra","🫛",[33,1.9,7,.2,3.2,.02],{al:["μπαμια","bamies","mpamies","bamia","ladies fingers"]});
+I("artichoke","veg","Αγκινάρα","Artichoke","🌼",[47,3.3,10.5,.2,5.4,.24],{pw:120,al:["αγκιναρες","aginara","agkinares","agginares","artichokes","καρδιες αγκιναρας"]});
+I("horta","veg","Χόρτα","Wild greens","🍃",[30,2.5,5,.4,3,.1],{al:["horta","xorta","βλιτα","vlita","ραδικια","radikia","σταμναγκαθι","greens","wild greens"]});
+I("mushrooms","veg","Μανιτάρια","Mushrooms","🍄",[22,3.1,3.3,.3,1,.01],{al:["μανιταρι","manitaria","manitari","πλευρωτους","pleurotus","champignon","champignons","mushroom"]});
+I("vine_leaves","veg","Αμπελόφυλλα","Vine leaves","🍃",[93,5.6,17,2.1,11,2.5],{al:["αμπελοφυλλο","ampelofylla","ampelofila","κληματοφυλλα","klimatofila","grape leaves","vine leaf"]});
+I("pork","meat","Χοιρινό","Pork","🍖",[196,27,0,9.5,0,.15],{an:"meat",al:["xoirino","hirino","χοιρινη μπριζολα","χοιρινες μπριζολες","pork chops","brizoles"]});
+I("lamb","meat","Αρνί","Lamb","🍖",[230,18,0,17.5,0,.17],{an:"meat",al:["arni","αρνακι","arnaki","αρνισιο","μπουτι αρνιου"]});
+I("beef","meat","Μοσχάρι","Beef","🥩",[170,26,0,7,0,.15],{an:"meat",al:["mosxari","moschari","μοσχαρισιο","beef stew","κρεας","kreas"]});
+I("squid","fish","Καλαμάρια","Squid","🦑",[92,15.6,3.1,1.4,0,.11],{an:"shell",alg:["mollusc"],al:["καλαμαρι","καλαμαρακια","kalamari","kalamaria","kalamarakia","calamari","σουπιες","soupies","cuttlefish"]});
+I("sardines","fish","Σαρδέλες","Sardines","🐟",[150,21,0,7,0,.2],{an:"fish",alg:["fish"],al:["σαρδελα","sardeles","sardela","γαυρος","gavros","anchovies","fresh anchovies"]});
+I("milk","dairy","Γάλα","Milk","🥛",[64,3.3,4.8,3.6,0,.11],{dens:1.03,an:"dairy",alg:["milk"],al:["gala","γαλα πληρες","fresh milk"]});
+I("butter","dairy","Βούτυρο","Butter","🧈",[717,.9,.1,81,0,.03],{an:"dairy",alg:["milk"],al:["voutyro","voutiro","βουτυρο αγελαδος"]});
+I("phyllo","grains","Φύλλο κρούστας","Phyllo pastry","🫓",[299,7.1,52.6,6,1.9,1.2],{alg:["gluten"],al:["φυλλο","fyllo","fillo","filo","phyllo","φυλλο πιτας","χωριατικο φυλλο","pastry sheets"]});
+I("rusk","grains","Παξιμάδι","Barley rusk","🥖",[380,12,72,3,10,1.2],{pw:60,alg:["gluten"],al:["παξιμαδια","paximadi","paximadia","κριθαροκουλουρα","dakos rusk"]});
+I("nutmeg","herbs","Μοσχοκάρυδο","Nutmeg","🌰",[525,5.8,49,36,21,.04],{al:["moschokarydo","mosxokarido"]});
+I("cumin","herbs","Κύμινο","Cumin","🫙",[375,17.8,44,22,10.5,.4],{al:["kymino","kimino"]});
+
+/* Extra names people commonly type: Greek spellings, plurals, Greeklish and English */
+const EXTRA_AL={
+ tomato:["ντοματούλες","tomata","tomates","ntomates","ντοματίνια","cherry tomatoes","ντομάτα σαλάτας"],
+ onion:["κρομμύδι","κρομμύδια","kromidi","kremmidi","kremmydia","ξερό κρεμμύδι","red onion","κόκκινο κρεμμύδι","κρεμμύδι ξερό"],
+ garlic:["σκόρδα","skorda","σκελίδα","σκελίδες σκόρδο"],
+ spinach:["σπανάκια","spanakia","baby spinach"],
+ zucchini:["κολοκύθια","κολοκύθι","kolokithia","kolokythia","zucchinis","courgettes"],
+ eggplant:["melitzanes","aubergines","eggplants","τσακώνικη μελιτζάνα"],
+ pepper_green:["πιπεριές φλωρίνης","florinis","κόκκινη πιπεριά","red pepper","peppers","piperies","πράσινη πιπεριά","κέρατο","πιπεριές κέρατο"],
+ potato:["πατατούλες","patatoules"],
+ carrot:["karota","καρότα"],
+ lemon:["λεμόνια","lemonia","λεμονάκι","χυμός λεμονιού","lemon juice"],
+ cucumber:["αγγουράκι","agouraki","aggouraki","cucumbers"],
+ green_beans:["φρέσκα φασολάκια","string beans","μπαρμπουνοφάσουλα"],
+ spring_onion:["φρέσκο κρεμμύδι","κρεμμυδάκια","kremmydakia","kremidakia","green onion","green onions"],
+ peas:["αρακά","araka","green peas","μπιζέλια","bizelia"],
+ chicken:["κότα","kota","κοτόπουλα","στήθος κοτόπουλο","μπούτι κοτόπουλο","chicken breast","chicken thighs","φιλέτο κοτόπουλο","κοτομπουκιές"],
+ beef_mince:["κιμά","kima","κιμάς μοσχαρίσιος","minced beef","ground meat","mince meat","κιμάς ανάμεικτος"],
+ tuna:["τόνο","tono","tuna"],
+ cod:["μπακαλιάρο","bakaliaro","ψάρι","psari","φιλέτο ψαριού","fish fillet","hake","πέρκα","γλώσσα","τσιπούρα","λαβράκι","tsipoura","lavraki"],
+ shrimp:["γαρίδα","garida","prawn"],
+ eggs:["αυγό","avgo","αβγά","αυγουλάκια"],
+ feta:["λευκό τυρί","lefko tyri","feta cheese"],
+ yogurt:["στραγγιστό","straggisto","greek yogurt","γιαουρτάκι"],
+ cheese_hard:["τριμμένο τυρί","grated cheese","κασέρι","kaseri","παρμεζάνα","parmezana","κεφαλογραβιέρα","kefalograviera","pecorino"],
+ rice:["ρύζι καρολίνα","ρύζι γλασέ","carolina","basmati","ρύζι νυχάκι","nyxaki","μπασμάτι"],
+ orzo:["μανέστρα","manestra","κριθαράκι μέτριο"],
+ pasta:["σπαγγέτι","spaggeti","μακαρονάκια","πένες","penes","penne","βίδες","vides","χυλοπίτες","hilopites","xylopites","noodles","zymarika","κοφτό","kofto","ταλιατέλες","tagliatelle","fusilli","linguine"],
+ bread:["ψωμάκι","psomaki","φρυγανιά","friganies","τριμμένη φρυγανιά","breadcrumbs","ψωμί του τοστ","tost","πίτες","πίτα για σουβλάκι","pita bread"],
+ trahanas:["τραχανά","trahana","xinohondros"],
+ lentils:["φακή","faki"],
+ white_beans:["γίγαντες","gigantes","φασόλια μέτρια","fasolia mesaia","φασόλια γίγαντες"],
+ chickpeas:["ρεβύθια","revithi","garbanzo","chick peas"],
+ split_peas:["φάβα σαντορίνης","split peas"],
+ black_eyed:["μαυρομάτικα φασόλια","black eyed beans"],
+ dill:["άνηθο","anitho"],
+ parsley:["μαϊντανό","maintano"],
+ mint:["δυόσμο","diosmo","μέντα","menta"],
+ oregano:["origano"],
+ cinnamon:["κανέλλα"],
+ pepper_black:["μαύρο πιπέρι","πιπέρι μαύρο","black pepper"],
+ olive_oil:["λάδι ελιάς","eleolado","extra virgin","παρθένο ελαιόλαδο"],
+ tomato_paste:["πελτέ","pelte","tomato puree"],
+ canned_tomato:["κονκασέ","konkase","πασάτα","τοματάκι","ψιλοκομμένα ντοματάκια","chopped tomatoes","tomato sauce"],
+ vinegar:["ξύδι","xydi","ksidi","ksydi"],
+ olives:["ελιά","elia","καλαμών","kalamon"]
+};
+Object.entries(EXTRA_AL).forEach(([id,a])=>INGM[id].al.push(...a));
+
 
 /* Ingredient swaps used when an ingredient is missing */
 const SUBS = {lemon:["vinegar"],feta:["cheese_hard"],cheese_hard:["feta"],canned_tomato:["tomato"],tomato:["canned_tomato"],tomato_paste:["canned_tomato"],
-  spring_onion:["onion"],onion:["spring_onion"],dill:["parsley"],parsley:["dill"],mint:["parsley"],orzo:["pasta","rice"],pasta:["orzo"],cheese_hard2:[]};
+  spring_onion:["onion"],onion:["spring_onion"],dill:["parsley"],parsley:["dill"],mint:["parsley"],orzo:["pasta","rice"],pasta:["orzo"],
+  butter:["olive_oil"],horta:["spinach"],spinach:["horta"],rusk:["bread"],beef:["pork"],pork:["beef"],sardines:["cod"],milk:["yogurt"]};
 
 /* ---------- Recipes ----------
  ing: [id, quantity, unit (g|ml|pc), role (c=core, i=important, o=optional, s=staple), nutrition factor (optional, e.g. oil absorbed when frying)]
@@ -380,7 +455,7 @@ R({id:"makaronia_kima",em:"🍝",el:"Μακαρόνια με κιμά",en:"Spagh
  ing:[["pasta",500,"g","c"],["beef_mince",500,"g","c"],["onion",1,"pc","i"],["garlic",2,"pc","i"],["canned_tomato",400,"g","i"],["tomato_paste",20,"g","o"],["cinnamon",1,"g","o"],["cheese_hard",60,"g","o"],["olive_oil",40,"ml","s"],["salt",10,"g","s",.6],["pepper_black",1,"g","s"],["water",3200,"ml","s"]],
  st:[[5,0,"Ψιλόκοψε το κρεμμύδι και το σκόρδο.","Chop the onion and garlic."],
   [5,"M","Σοτάρισε το κρεμμύδι και το σκόρδο στο ελαιόλαδο.","Sauté the onion and garlic in the olive oil."],
-  [8,"H","Πρόσθεσε τον κιμά και σπάσε τον με ξύλινη κουτάλα μέχρι να αλλάξει χρώμα.","Add the mince and break it up with a wooden spatula until browned."],
+  [8,"H","Πρόσθεσε τον κιμά και σπάσε τον με ξύλινη σπάτουλα μέχρι να αλλάξει χρώμα.","Add the mince and break it up with a wooden spatula until browned."],
   [3,"H","Ρίξε τη ντομάτα, τον πελτέ, την κανέλα, 200 ml νερό, 4 g αλάτι και το πιπέρι και φέρε σε βρασμό.","Add the tomatoes, paste, cinnamon, 200 ml water, 4 g salt and the pepper and bring to the boil."],
   [35,"L","Σιγόβρασε μέχρι να δέσει η σάλτσα.","Simmer until the sauce thickens."],
   [10,"H","Στο μεταξύ βράσε τα μακαρόνια σε 3 λίτρα νερό με το υπόλοιπο αλάτι και στράγγιξε.","Meanwhile boil the pasta in 3 litres of water with the remaining salt and drain.",1],
@@ -483,11 +558,342 @@ R({id:"aglio_olio",em:"🍝",el:"Μακαρόνια με σκόρδο και λ�
   [3,"L","Στο μεταξύ ζέστανε το ελαιόλαδο με το σκόρδο σε λεπτές φέτες μέχρι να χρυσίσει ελαφρά.","Meanwhile warm the olive oil with the thinly sliced garlic until lightly golden.",1],
   [2,"M","Ανακάτεψε τα μακαρόνια με το λάδι, το νερό που κράτησες, το πιπέρι και τον μαϊντανό.","Toss the pasta with the oil, the reserved water, the pepper and the parsley."]]});
 
+/* ---------- v1.2: more Greek recipes ---------- */
+R({id:"gemista",em:"🫑",el:"Γεμιστά",en:"Stuffed tomatoes and peppers (Gemista)",del:"Ντομάτες και πιπεριές γεμιστές με ρύζι και μυρωδικά.",den:"Tomatoes and peppers stuffed with rice and herbs.",sv:4,dif:2,g:1,
+ ing:[["tomato",6,"pc","c"],["rice",250,"g","c"],["pepper_green",4,"pc","i"],["onion",2,"pc","i"],["parsley",15,"g","o"],["mint",10,"g","o"],["potato",3,"pc","o"],["olive_oil",120,"ml","s"],["salt",8,"g","s"],["pepper_black",1,"g","s"],["water",200,"ml","s"]],
+ st:[[15,0,"Κόψε ένα καπάκι από τις ντομάτες και τις πιπεριές. Άδειασε τις ντομάτες και ψιλόκοψε τη ψίχα τους. Ψιλόκοψε το κρεμμύδι και τα μυρωδικά.","Cut a lid off the tomatoes and peppers. Hollow out the tomatoes and chop the pulp. Chop the onion and herbs."],
+  [5,"M","Σοτάρισε το κρεμμύδι στο μισό ελαιόλαδο μέχρι να μαλακώσει.","Sauté the onion in half the olive oil until soft."],
+  [5,"L","Πρόσθεσε το ρύζι, τη ψίχα της ντομάτας, τα μυρωδικά, το αλάτι και το πιπέρι, ανακάτεψε και κατέβασε από τη φωτιά.","Add the rice, tomato pulp, herbs, salt and pepper, stir and remove from the heat."],
+  [10,0,"Γέμισε τα λαχανικά μέχρι τα ¾, σκέπασε με τα καπάκια και βάλε τις πατάτες σε κομμάτια ανάμεσα. Περιέλουσε με το υπόλοιπο ελαιόλαδο και το νερό.","Fill the vegetables to ¾, cover with the lids and place the potato pieces in between. Pour over the remaining olive oil and the water."],
+  [60,180,"Ψήσε σκεπασμένο με αλουμινόχαρτο.","Bake covered with foil."],
+  [30,200,"Βγάλε το αλουμινόχαρτο και ψήσε μέχρι να ροδίσουν.","Remove the foil and bake until golden."]]});
+
+R({id:"moussakas",em:"🍆",el:"Μουσακάς",en:"Moussaka",del:"Μελιτζάνες, πατάτες, κιμάς και μπεσαμέλ στον φούρνο.",den:"Baked eggplant, potato, meat sauce and béchamel.",sv:6,dif:3,g:1,
+ ing:[["eggplant",3,"pc","c"],["beef_mince",500,"g","c"],["potato",3,"pc","i"],["canned_tomato",400,"g","i"],["onion",1,"pc","i"],["milk",700,"ml","i"],["butter",80,"g","i"],["flour",80,"g","i"],["eggs",2,"pc","i"],["cheese_hard",80,"g","o"],["cinnamon",1,"g","o"],["nutmeg",1,"g","o"],["olive_oil",100,"ml","s"],["salt",10,"g","s"],["pepper_black",1,"g","s"]],
+ st:[[10,0,"Κόψε τις μελιτζάνες και τις πατάτες σε ροδέλες πάχους 1 cm και αλάτισε τις μελιτζάνες.","Slice the eggplants and potatoes into 1 cm rounds and salt the eggplant."],
+  [25,220,"Άλειψε με τα ¾ του ελαιόλαδου και ψήσε σε ταψιά μέχρι να μαλακώσουν.","Brush with ¾ of the olive oil and bake on trays until soft."],
+  [5,"M","Σοτάρισε το ψιλοκομμένο κρεμμύδι στο υπόλοιπο ελαιόλαδο.","Sauté the chopped onion in the remaining olive oil."],
+  [8,"H","Πρόσθεσε τον κιμά και ανακάτευε μέχρι να αλλάξει χρώμα.","Add the mince and stir until browned."],
+  [25,"L","Ρίξε τη ντομάτα, την κανέλα, το αλάτι και το πιπέρι και σιγόβρασε μέχρι να εξατμιστούν τα υγρά.","Add the tomatoes, cinnamon, salt and pepper and simmer until the liquid evaporates."],
+  [3,"M","Για την μπεσαμέλ λιώσε το βούτυρο, ρίξε το αλεύρι και ανακάτευε.","For the béchamel, melt the butter, add the flour and stir."],
+  [10,"M","Ρίξε σιγά σιγά το ζεστό γάλα ανακατεύοντας συνεχώς με σύρμα μέχρι να πήξει. Κατέβασε και ανακάτεψε τα αυγά, το μοσχοκάρυδο και τα μισά τυριά.","Slowly add the hot milk, whisking constantly until thick. Remove from the heat and stir in the eggs, nutmeg and half the cheese."],
+  [10,0,"Στρώσε σε ταψί τις πατάτες, τις μελιτζάνες, τον κιμά και από πάνω την μπεσαμέλ. Πασπάλισε με το υπόλοιπο τυρί.","Layer the potatoes, eggplant and meat sauce in a tray and top with the béchamel. Sprinkle with the remaining cheese."],
+  [45,180,"Ψήσε μέχρι να ροδίσει η επιφάνεια.","Bake until the top is golden."],
+  [20,0,"Άφησε να κρυώσει πριν το κόψεις.","Let it cool before cutting."]]});
+
+R({id:"pastitsio",em:"🍝",el:"Παστίτσιο",en:"Pastitsio",del:"Μακαρόνια με κιμά και μπεσαμέλ στον φούρνο.",den:"Baked pasta with meat sauce and béchamel.",sv:8,dif:3,g:1,
+ ing:[["pasta",500,"g","c"],["beef_mince",500,"g","c"],["canned_tomato",400,"g","i"],["onion",1,"pc","i"],["milk",1000,"ml","i"],["butter",100,"g","i"],["flour",100,"g","i"],["eggs",3,"pc","i"],["cheese_hard",120,"g","i"],["cinnamon",1,"g","o"],["nutmeg",1,"g","o"],["olive_oil",40,"ml","s"],["salt",14,"g","s",.6],["pepper_black",1,"g","s"],["water",4000,"ml","s"]],
+ st:[[5,0,"Ψιλόκοψε το κρεμμύδι.","Chop the onion."],
+  [5,"M","Σοτάρισε το κρεμμύδι στο ελαιόλαδο.","Sauté the onion in the olive oil."],
+  [8,"H","Πρόσθεσε τον κιμά και ανακάτευε μέχρι να αλλάξει χρώμα.","Add the mince and stir until browned."],
+  [25,"L","Ρίξε τη ντομάτα, την κανέλα, 5 g αλάτι και το πιπέρι και σιγόβρασε μέχρι να δέσει.","Add the tomatoes, cinnamon, 5 g salt and the pepper and simmer until thick."],
+  [8,"H","Βράσε τα μακαρόνια σε 4 λίτρα νερό με το υπόλοιπο αλάτι, 2 λεπτά λιγότερο από τον χρόνο της συσκευασίας, και στράγγιξε.","Boil the pasta in 4 litres of water with the remaining salt, 2 minutes less than the packet time, and drain."],
+  [3,"M","Για την μπεσαμέλ λιώσε το βούτυρο, ρίξε το αλεύρι και ανακάτευε.","For the béchamel, melt the butter, add the flour and stir."],
+  [10,"M","Ρίξε σιγά σιγά το ζεστό γάλα ανακατεύοντας συνεχώς με σύρμα μέχρι να πήξει. Κατέβασε και ανακάτεψε τα αυγά, το μοσχοκάρυδο και τα μισά τυριά.","Slowly add the hot milk, whisking constantly until thick. Remove from the heat and stir in the eggs, nutmeg and half the cheese."],
+  [10,0,"Στρώσε τα μισά μακαρόνια σε ταψί, μετά τον κιμά, τα υπόλοιπα μακαρόνια και από πάνω την μπεσαμέλ. Πασπάλισε με το υπόλοιπο τυρί.","Layer half the pasta in a tray, then the meat sauce, the rest of the pasta and the béchamel on top. Sprinkle with the remaining cheese."],
+  [50,180,"Ψήσε μέχρι να ροδίσει η επιφάνεια.","Bake until the top is golden."],
+  [20,0,"Άφησε να κρυώσει πριν το κόψεις.","Let it cool before cutting."]]});
+
+R({id:"spanakopita",em:"🥧",el:"Σπανακόπιτα",en:"Spinach pie (Spanakopita)",del:"Τραγανή πίτα με σπανάκι, φέτα και άνηθο.",den:"Crispy pie with spinach, feta and dill.",sv:8,dif:2,g:1,
+ ing:[["phyllo",450,"g","c"],["spinach",1000,"g","c"],["feta",300,"g","i"],["eggs",2,"pc","i"],["spring_onion",5,"pc","o"],["dill",20,"g","o"],["olive_oil",150,"ml","s"],["salt",3,"g","s"],["pepper_black",1,"g","s"]],
+ st:[[15,0,"Πλύνε και ψιλόκοψε το σπανάκι, τα φρεσκοκρέμμυδα και τον άνηθο. Αλάτισε το σπανάκι, τρίψε το με τα χέρια και στύψε τα υγρά.","Wash and chop the spinach, spring onions and dill. Salt the spinach, rub it by hand and squeeze out the liquid."],
+  [5,0,"Ανακάτεψε το σπανάκι με τη θρυμματισμένη φέτα, τα αυγά, τα μυρωδικά, το πιπέρι και 50 ml ελαιόλαδο.","Mix the spinach with the crumbled feta, eggs, herbs, pepper and 50 ml olive oil."],
+  [15,0,"Στρώσε σε λαδωμένο ταψί τα μισά φύλλα, λαδώνοντας το καθένα. Άπλωσε τη γέμιση, σκέπασε με τα υπόλοιπα φύλλα λαδωμένα και χάραξε σε κομμάτια.","Lay half the sheets in an oiled tray, oiling each one. Spread the filling, cover with the remaining oiled sheets and score into pieces."],
+  [50,180,"Ψήσε μέχρι να ροδίσει και να γίνει τραγανή.","Bake until golden and crisp."],
+  [15,0,"Άφησε να κρυώσει πριν τη σερβίρεις.","Let it cool before serving."]]});
+
+R({id:"tyropita",em:"🧀",el:"Τυρόπιτα",en:"Cheese pie (Tyropita)",del:"Πίτα με φέτα, αυγά και φύλλο.",den:"Pie with feta, eggs and phyllo.",sv:8,dif:2,g:1,
+ ing:[["phyllo",450,"g","c"],["feta",400,"g","c"],["eggs",3,"pc","i"],["milk",200,"ml","i"],["butter",100,"g","i"],["pepper_black",1,"g","s"]],
+ st:[[3,"L","Λιώσε το βούτυρο.","Melt the butter."],
+  [5,0,"Ανακάτεψε τη θρυμματισμένη φέτα με τα αυγά, το γάλα και το πιπέρι.","Mix the crumbled feta with the eggs, milk and pepper."],
+  [15,0,"Στρώσε τα μισά φύλλα σε βουτυρωμένο ταψί, αλείφοντας το καθένα με βούτυρο. Άπλωσε τη γέμιση και σκέπασε με τα υπόλοιπα φύλλα βουτυρωμένα. Χάραξε σε κομμάτια.","Lay half the sheets in a buttered tray, brushing each with butter. Spread the filling and cover with the remaining buttered sheets. Score into pieces."],
+  [45,180,"Ψήσε μέχρι να ροδίσει.","Bake until golden."],
+  [10,0,"Άφησε να κρυώσει πριν τη σερβίρεις.","Let it cool before serving."]]});
+
+R({id:"bamies",em:"🫛",el:"Μπάμιες λαδερές",en:"Okra in tomato sauce",del:"Λαδερό με μπάμιες και ντομάτα.",den:"Olive oil stew with okra and tomato.",sv:4,dif:2,g:1,
+ ing:[["okra",700,"g","c"],["canned_tomato",400,"g","i"],["onion",2,"pc","i"],["vinegar",100,"ml","i",0],["parsley",15,"g","o"],["olive_oil",100,"ml","s"],["salt",8,"g","s"],["pepper_black",1,"g","s"],["water",200,"ml","s"]],
+ st:[[10,0,"Καθάρισε το κοτσάνι από τις μπάμιες χωρίς να τις ανοίξεις.","Trim the okra stems without cutting into the pods."],
+  [30,0,"Ανακάτεψε τις μπάμιες με το ξίδι και 3 g αλάτι, άφησε να σταθούν και ξέπλυνε.","Toss the okra with the vinegar and 3 g salt, let it stand, then rinse."],
+  [5,"M","Σοτάρισε το ψιλοκομμένο κρεμμύδι στο ελαιόλαδο.","Sauté the chopped onion in the olive oil."],
+  [3,"H","Ρίξε τη ντομάτα, το νερό, το υπόλοιπο αλάτι και το πιπέρι και φέρε σε βρασμό.","Add the tomatoes, water, remaining salt and pepper and bring to the boil."],
+  [35,"L","Πρόσθεσε τις μπάμιες και σιγόβρασε σκεπασμένο. Κούνα την κατσαρόλα αντί να ανακατεύεις. Πασπάλισε με μαϊντανό.","Add the okra and simmer covered. Shake the pot instead of stirring. Sprinkle with parsley."]]});
+
+R({id:"agkinares_polita",em:"🌼",el:"Αγκινάρες αλά πολίτα",en:"Artichokes à la Polita",del:"Αγκινάρες με πατάτες, καρότα και άνηθο σε λεμονάτη σάλτσα.",den:"Artichokes with potatoes, carrots and dill in lemon sauce.",sv:4,dif:2,g:1,
+ ing:[["artichoke",8,"pc","c"],["potato",3,"pc","i"],["carrot",2,"pc","i"],["spring_onion",4,"pc","i"],["lemon",2,"pc","i"],["dill",20,"g","o"],["olive_oil",120,"ml","s"],["salt",8,"g","s"],["pepper_black",1,"g","s"],["water",500,"ml","s"]],
+ st:[[15,0,"Καθάρισε τις αγκινάρες και κράτησέ τις σε νερό με χυμό από το ένα λεμόνι. Κόψε τις πατάτες σε κομμάτια και τα καρότα σε ροδέλες.","Clean the artichokes and keep them in water with the juice of one lemon. Cut the potatoes into chunks and slice the carrots."],
+  [5,"M","Σοτάρισε τα ψιλοκομμένα φρεσκοκρέμμυδα στο ελαιόλαδο.","Sauté the chopped spring onions in the olive oil."],
+  [3,"H","Πρόσθεσε τα λαχανικά, το νερό, τον χυμό του δεύτερου λεμονιού, το αλάτι και το πιπέρι και φέρε σε βρασμό.","Add the vegetables, water, juice of the second lemon, salt and pepper and bring to the boil."],
+  [35,"L","Σιγόβρασε σκεπασμένο μέχρι να μαλακώσουν τα λαχανικά.","Simmer covered until the vegetables are tender."],
+  [2,0,"Πρόσθεσε τον άνηθο και άφησε σκεπασμένο να ξεκουραστεί.","Add the dill and let it rest covered."]]});
+
+R({id:"prasorizo",em:"🌱",el:"Πρασόρυζο",en:"Leek and rice (Prasorizo)",del:"Νηστίσιμο λαδερό με πράσα, ρύζι και λεμόνι.",den:"Lenten olive oil dish with leeks, rice and lemon.",sv:4,dif:1,g:1,
+ ing:[["leek",3,"pc","c"],["rice",200,"g","c"],["lemon",1,"pc","i"],["carrot",1,"pc","o"],["dill",10,"g","o"],["olive_oil",80,"ml","s"],["salt",6,"g","s"],["pepper_black",1,"g","s"],["water",700,"ml","s"]],
+ st:[[10,0,"Κόψε τα πράσα σε ροδέλες, πλύνε τα καλά και κόψε το καρότο σε κυβάκια.","Slice the leeks into rounds, wash them well and dice the carrot."],
+  [10,"M","Σοτάρισε τα πράσα και το καρότο στο ελαιόλαδο μέχρι να μαλακώσουν.","Sauté the leeks and carrot in the olive oil until soft."],
+  [3,"H","Ρίξε το ρύζι, το νερό, το αλάτι και το πιπέρι και φέρε σε βρασμό.","Add the rice, water, salt and pepper and bring to the boil."],
+  [18,"L","Σιγόβρασε σκεπασμένο μέχρι να απορροφηθούν τα υγρά.","Simmer covered until the liquid is absorbed."],
+  [5,0,"Πρόσθεσε τον χυμό λεμονιού και τον άνηθο και άφησε σκεπασμένο να ξεκουραστεί.","Add the lemon juice and dill and let it rest covered."]]});
+
+R({id:"lahanorizo",em:"🥬",el:"Λαχανόρυζο",en:"Cabbage and rice (Lahanorizo)",del:"Οικονομικό λαδερό με λάχανο, ρύζι και ντομάτα.",den:"Budget olive oil dish with cabbage, rice and tomato.",sv:4,dif:1,g:1,
+ ing:[["cabbage",800,"g","c"],["rice",200,"g","c"],["onion",1,"pc","i"],["canned_tomato",200,"g","i"],["dill",10,"g","o"],["olive_oil",80,"ml","s"],["salt",8,"g","s"],["pepper_black",1,"g","s"],["water",600,"ml","s"]],
+ st:[[10,0,"Κόψε το λάχανο σε λεπτές λωρίδες και ψιλόκοψε το κρεμμύδι.","Shred the cabbage thinly and chop the onion."],
+  [5,"M","Σοτάρισε το κρεμμύδι στο ελαιόλαδο.","Sauté the onion in the olive oil."],
+  [8,"M","Πρόσθεσε το λάχανο και ανακάτευε μέχρι να μαραθεί.","Add the cabbage and stir until wilted."],
+  [3,"H","Ρίξε τη ντομάτα, το νερό, το αλάτι και το πιπέρι και φέρε σε βρασμό.","Add the tomatoes, water, salt and pepper and bring to the boil."],
+  [20,"L","Ρίξε το ρύζι και σιγόβρασε σκεπασμένο μέχρι να απορροφηθούν τα υγρά. Πρόσθεσε τον άνηθο.","Add the rice and simmer covered until the liquid is absorbed. Add the dill."]]});
+
+R({id:"kounoupidi_giahni",em:"🥦",el:"Κουνουπίδι γιαχνί",en:"Cauliflower stew",del:"Κουνουπίδι σε σάλτσα ντομάτας με κρεμμύδια.",den:"Cauliflower in tomato and onion sauce.",sv:4,dif:1,g:1,
+ ing:[["cauliflower",1,"pc","c"],["canned_tomato",400,"g","i"],["onion",2,"pc","i"],["cinnamon",1,"g","o"],["olive_oil",80,"ml","s"],["salt",7,"g","s"],["pepper_black",1,"g","s"],["water",200,"ml","s"]],
+ st:[[10,0,"Κόψε το κουνουπίδι σε μπουκέτα και ψιλόκοψε τα κρεμμύδια.","Cut the cauliflower into florets and chop the onions."],
+  [5,"M","Σοτάρισε τα κρεμμύδια στο ελαιόλαδο.","Sauté the onions in the olive oil."],
+  [3,"H","Ρίξε τη ντομάτα, το νερό, την κανέλα, το αλάτι και το πιπέρι και φέρε σε βρασμό.","Add the tomatoes, water, cinnamon, salt and pepper and bring to the boil."],
+  [25,"L","Πρόσθεσε το κουνουπίδι και σιγόβρασε σκεπασμένο μέχρι να μαλακώσει.","Add the cauliflower and simmer covered until tender."]]});
+
+R({id:"sardeles_fournou",em:"🐟",el:"Σαρδέλες στον φούρνο",en:"Baked sardines",del:"Σαρδέλες με λεμόνι, σκόρδο και ρίγανη.",den:"Sardines with lemon, garlic and oregano.",sv:4,dif:1,g:1,
+ ing:[["sardines",800,"g","c"],["lemon",2,"pc","i"],["garlic",3,"pc","i"],["oregano",2,"g","i"],["parsley",10,"g","o"],["olive_oil",80,"ml","s"],["salt",6,"g","s"],["pepper_black",1,"g","s"]],
+ st:[[15,0,"Καθάρισε τις σαρδέλες, βγάζοντας κεφάλια και εντόσθια, και ξέπλυνε.","Clean the sardines, removing heads and guts, and rinse."],
+  [5,0,"Βάλε τις σε ταψί και πρόσθεσε το ψιλοκομμένο σκόρδο, τον χυμό λεμονιού, το ελαιόλαδο, τη ρίγανη, το αλάτι και το πιπέρι.","Arrange them in a tray and add the chopped garlic, lemon juice, olive oil, oregano, salt and pepper."],
+  [25,200,"Ψήσε μέχρι να ροδίσουν. Πασπάλισε με μαϊντανό.","Bake until golden. Sprinkle with parsley."]]});
+
+R({id:"kalamarakia",em:"🦑",el:"Καλαμαράκια τηγανητά",en:"Fried calamari",del:"Τραγανά καλαμαράκια με λεμόνι.",den:"Crispy calamari with lemon.",sv:4,dif:2,g:1,
+ ing:[["squid",800,"g","c"],["flour",100,"g","i",.3],["lemon",1,"pc","i"],["olive_oil",300,"ml","s",.12],["salt",6,"g","s"]],
+ st:[[15,0,"Καθάρισε τα καλαμάρια, κόψε τα σε κρίκους και στέγνωσέ τα με χαρτί κουζίνας.","Clean the squid, cut into rings and pat dry with kitchen paper."],
+  [3,0,"Αλάτισε και αλεύρωσέ τα, τινάζοντας το περιττό αλεύρι.","Salt and coat in flour, shaking off the excess."],
+  [10,"H","Τηγάνισε σε καυτό ελαιόλαδο σε δόσεις, 2 με 3 λεπτά τη φορά, μέχρι να ροδίσουν.","Fry in hot olive oil in batches, 2 to 3 minutes each, until golden."],
+  [2,0,"Στράγγιξε σε χαρτί κουζίνας και σέρβιρε με λεμόνι.","Drain on kitchen paper and serve with lemon."]]});
+
+R({id:"soutzoukakia",em:"🧆",el:"Σουτζουκάκια σμυρνέικα",en:"Smyrna meatballs (Soutzoukakia)",del:"Μακρόστενα κεφτεδάκια με κύμινο σε σάλτσα ντομάτας.",den:"Cumin meatballs in tomato sauce.",sv:4,dif:2,g:1,
+ ing:[["beef_mince",600,"g","c"],["canned_tomato",400,"g","c"],["bread",80,"g","i"],["eggs",1,"pc","i"],["garlic",3,"pc","i"],["cumin",3,"g","i"],["onion",1,"pc","o"],["parsley",10,"g","o"],["olive_oil",60,"ml","s"],["salt",8,"g","s"],["pepper_black",1,"g","s"],["water",200,"ml","s"]],
+ st:[[5,0,"Μούσκεψε το ψωμί σε 100 ml νερό και στύψε το.","Soak the bread in 100 ml water and squeeze it."],
+  [10,0,"Ζύμωσε τον κιμά με το ψωμί, το αυγό, το σκόρδο, το κύμινο, τον μαϊντανό, 6 g αλάτι και το πιπέρι. Πλάσε μακρόστενα κομμάτια περίπου 50 g.","Knead the mince with the bread, egg, garlic, cumin, parsley, 6 g salt and the pepper. Shape oblong pieces of about 50 g."],
+  [25,220,"Ψήσε σε ταψί μέχρι να ροδίσουν, γυρίζοντάς τα μία φορά.","Bake on a tray until browned, turning once."],
+  [5,"M","Στο μεταξύ σοτάρισε το ψιλοκομμένο κρεμμύδι στο ελαιόλαδο.","Meanwhile sauté the chopped onion in the olive oil.",1],
+  [15,"L","Πρόσθεσε τη ντομάτα, 100 ml νερό και το υπόλοιπο αλάτι και σιγόβρασε.","Add the tomatoes, 100 ml water and the remaining salt and simmer.",1],
+  [20,"L","Βάλε τα σουτζουκάκια στη σάλτσα και σιγόβρασε.","Add the meatballs to the sauce and simmer."]]});
+
+R({id:"moschari_kokkinisto",em:"🥩",el:"Μοσχάρι κοκκινιστό",en:"Beef in tomato sauce (Kokkinisto)",del:"Μοσχάρι σιγομαγειρεμένο σε σάλτσα ντομάτας με κανέλα.",den:"Slow-cooked beef in tomato sauce with cinnamon.",sv:5,dif:2,g:1,
+ ing:[["beef",1000,"g","c"],["canned_tomato",400,"g","i"],["onion",2,"pc","i"],["garlic",2,"pc","i"],["tomato_paste",20,"g","o"],["cinnamon",1,"g","o"],["olive_oil",80,"ml","s"],["salt",10,"g","s"],["pepper_black",2,"g","s"],["water",500,"ml","s"]],
+ st:[[10,0,"Κόψε το μοσχάρι σε μερίδες και ψιλόκοψε το κρεμμύδι και το σκόρδο.","Cut the beef into portions and chop the onion and garlic."],
+  [10,"H","Σοτάρισε το μοσχάρι στο ελαιόλαδο να ροδίσει από όλες τις πλευρές.","Brown the beef in the olive oil on all sides."],
+  [5,"M","Πρόσθεσε το κρεμμύδι και το σκόρδο και σοτάρισε.","Add the onion and garlic and sauté."],
+  [3,"H","Ρίξε τη ντομάτα, τον πελτέ, το νερό, την κανέλα, το αλάτι και το πιπέρι και φέρε σε βρασμό.","Add the tomatoes, paste, water, cinnamon, salt and pepper and bring to the boil."],
+  [90,"L","Σιγόβρασε σκεπασμένο μέχρι να μαλακώσει το κρέας και να δέσει η σάλτσα.","Simmer covered until the meat is tender and the sauce is thick."]]});
+
+R({id:"arni_lemonato",em:"🍖",el:"Αρνί λεμονάτο με πατάτες",en:"Lemon lamb with potatoes",del:"Αρνί στον φούρνο με πατάτες, λεμόνι και ρίγανη.",den:"Oven-roasted lamb with potatoes, lemon and oregano.",sv:5,dif:2,g:1,
+ ing:[["lamb",1200,"g","c"],["potato",1200,"g","c"],["lemon",2,"pc","i"],["garlic",4,"pc","i"],["oregano",3,"g","i"],["olive_oil",100,"ml","s"],["salt",12,"g","s"],["pepper_black",2,"g","s"],["water",300,"ml","s"]],
+ st:[[15,0,"Κόψε τις πατάτες σε φέτες κατά μήκος. Βάλε το αρνί και τις πατάτες σε ταψί.","Cut the potatoes into wedges. Place the lamb and potatoes in a tray."],
+  [5,0,"Περιέλουσε με χυμό λεμονιού, ελαιόλαδο, ψιλοκομμένο σκόρδο, ρίγανη, αλάτι και πιπέρι και πρόσθεσε το νερό.","Pour over the lemon juice, olive oil, chopped garlic, oregano, salt and pepper and add the water."],
+  [90,180,"Ψήσε σκεπασμένο με αλουμινόχαρτο.","Bake covered with foil."],
+  [30,200,"Βγάλε το αλουμινόχαρτο, γύρισε το κρέας και ψήσε μέχρι να ροδίσει.","Remove the foil, turn the meat and bake until golden."]]});
+
+R({id:"hirines_brizoles",em:"🍖",el:"Χοιρινές μπριζόλες με λεμόνι και ρίγανη",en:"Pork chops with lemon and oregano",del:"Γρήγορες μπριζόλες στο τηγάνι.",den:"Quick pan-cooked pork chops.",sv:4,dif:1,g:1,
+ ing:[["pork",800,"g","c"],["lemon",1,"pc","i"],["oregano",2,"g","i"],["olive_oil",40,"ml","s"],["salt",5,"g","s"],["pepper_black",1,"g","s"]],
+ st:[[5,0,"Αλείψε τις μπριζόλες με το ελαιόλαδο και πασπάλισε με αλάτι, πιπέρι και ρίγανη.","Brush the chops with the olive oil and season with salt, pepper and oregano."],
+  [4,"H","Ρόδισε σε τηγάνι ή γκριλιέρα, 2 λεπτά από κάθε πλευρά.","Sear in a pan or grill pan, 2 minutes per side."],
+  [10,"M","Ψήσε 5 λεπτά από κάθε πλευρά μέχρι να ψηθούν μέσα.","Cook 5 minutes per side until cooked through."],
+  [3,0,"Άφησε να ξεκουραστούν και περιέλουσε με χυμό λεμονιού.","Let them rest and pour over the lemon juice."]]});
+
+R({id:"horta",em:"🍃",el:"Χόρτα βραστά",en:"Boiled wild greens (Horta)",del:"Βραστά χόρτα με ελαιόλαδο και λεμόνι.",den:"Boiled greens with olive oil and lemon.",sv:4,dif:1,g:1,
+ ing:[["horta",1000,"g","c"],["lemon",1,"pc","i"],["olive_oil",50,"ml","s"],["salt",8,"g","s",.3],["water",3000,"ml","s"]],
+ st:[[15,0,"Καθάρισε και πλύνε καλά τα χόρτα.","Trim and wash the greens well."],
+  [8,"H","Φέρε σε βρασμό το νερό με το αλάτι.","Bring the water to the boil with the salt."],
+  [15,"M","Βράσε τα χόρτα μέχρι να μαλακώσουν και στράγγιξε.","Boil the greens until tender and drain."],
+  [1,0,"Σέρβιρε με ελαιόλαδο και χυμό λεμονιού.","Serve with olive oil and lemon juice."]]});
+
+R({id:"patates_giahni",em:"🥔",el:"Πατάτες γιαχνί",en:"Potatoes in tomato sauce",del:"Πατάτες σιγομαγειρεμένες σε σάλτσα ντομάτας.",den:"Potatoes slow-cooked in tomato sauce.",sv:4,dif:1,g:1,
+ ing:[["potato",1200,"g","c"],["canned_tomato",400,"g","i"],["onion",2,"pc","i"],["garlic",2,"pc","o"],["oregano",1,"g","o"],["olive_oil",100,"ml","s"],["salt",9,"g","s"],["pepper_black",1,"g","s"],["water",400,"ml","s"]],
+ st:[[10,0,"Καθάρισε και κόψε τις πατάτες σε κομμάτια. Ψιλόκοψε το κρεμμύδι και το σκόρδο.","Peel and cut the potatoes into chunks. Chop the onion and garlic."],
+  [5,"M","Σοτάρισε το κρεμμύδι και το σκόρδο στο ελαιόλαδο.","Sauté the onion and garlic in the olive oil."],
+  [3,"H","Πρόσθεσε τις πατάτες, τη ντομάτα, το νερό, το αλάτι, το πιπέρι και τη ρίγανη και φέρε σε βρασμό.","Add the potatoes, tomatoes, water, salt, pepper and oregano and bring to the boil."],
+  [35,"L","Σιγόβρασε σκεπασμένο μέχρι να μαλακώσουν οι πατάτες και να δέσει η σάλτσα.","Simmer covered until the potatoes are soft and the sauce is thick."]]});
+
+R({id:"dakos",em:"🍅",el:"Ντάκος",en:"Cretan dakos",del:"Παξιμάδι με τριμμένη ντομάτα, φέτα και ελαιόλαδο.",den:"Barley rusk with grated tomato, feta and olive oil.",sv:2,dif:1,g:1,
+ ing:[["rusk",2,"pc","c"],["tomato",2,"pc","c"],["feta",100,"g","i"],["olives",40,"g","o"],["oregano",1,"g","o"],["olive_oil",40,"ml","s"],["salt",1,"g","s"],["water",30,"ml","s"]],
+ st:[[2,0,"Ράντισε τα παξιμάδια με το νερό για να μαλακώσουν ελαφρά.","Sprinkle the rusks with the water to soften them slightly."],
+  [5,0,"Τρίψε τις ντομάτες, αλάτισε και άπλωσέ τες πάνω στα παξιμάδια.","Grate the tomatoes, salt them and spread over the rusks."],
+  [2,0,"Θρυμμάτισε τη φέτα από πάνω, πρόσθεσε τις ελιές, τη ρίγανη και το ελαιόλαδο.","Crumble the feta on top and add the olives, oregano and olive oil."]]});
+
+R({id:"melitzanosalata",em:"🍆",el:"Μελιτζανοσαλάτα",en:"Eggplant dip (Melitzanosalata)",del:"Καπνιστή σαλάτα από ψητές μελιτζάνες.",den:"Smoky roasted eggplant dip.",sv:6,dif:1,g:1,
+ ing:[["eggplant",3,"pc","c"],["garlic",2,"pc","i"],["vinegar",20,"ml","i"],["parsley",10,"g","o"],["olive_oil",80,"ml","s"],["salt",5,"g","s"]],
+ st:[[45,220,"Τρύπησε τις μελιτζάνες με πιρούνι και ψήσε ολόκληρες μέχρι να μαλακώσουν και να καψαλιστεί η φλούδα.","Prick the eggplants with a fork and roast whole until soft and the skin is charred."],
+  [10,0,"Ξεφλούδισε και άφησε τη σάρκα να στραγγίξει σε σουρωτήρι.","Peel and let the flesh drain in a colander."],
+  [5,0,"Ψιλόκοψε τη σάρκα και ανακάτεψε με το λιωμένο σκόρδο, το ξίδι, το ελαιόλαδο, το αλάτι και τον μαϊντανό.","Chop the flesh and mix with the crushed garlic, vinegar, olive oil, salt and parsley."]]});
+
+R({id:"bifteki",em:"🍔",el:"Μπιφτέκια",en:"Greek burgers (Biftekia)",del:"Ζουμερά μπιφτέκια με κρεμμύδι και ρίγανη.",den:"Juicy patties with onion and oregano.",sv:4,dif:1,g:1,
+ ing:[["beef_mince",600,"g","c"],["onion",1,"pc","i"],["bread",60,"g","i"],["oregano",2,"g","i"],["eggs",1,"pc","o"],["parsley",10,"g","o"],["olive_oil",30,"ml","s"],["salt",8,"g","s"],["pepper_black",1,"g","s"],["water",100,"ml","s"]],
+ st:[[5,0,"Μούσκεψε το ψωμί στο νερό και στύψε το.","Soak the bread in the water and squeeze it."],
+  [10,0,"Ζύμωσε τον κιμά με το τριμμένο κρεμμύδι, το ψωμί, το αυγό, τη ρίγανη, τον μαϊντανό, το αλάτι και το πιπέρι. Πλάσε μπιφτέκια περίπου 120 g.","Knead the mince with the grated onion, bread, egg, oregano, parsley, salt and pepper. Shape patties of about 120 g."],
+  [16,"M","Ψήσε σε τηγάνι ή γκριλιέρα αλειμμένη με το ελαιόλαδο, 8 λεπτά από κάθε πλευρά.","Cook in a pan or grill pan brushed with the olive oil, 8 minutes per side."]]});
+
+R({id:"kotopoulo_hilopites",em:"🍗",el:"Κοτόπουλο με χυλοπίτες",en:"Chicken with egg noodles",del:"Κοτόπουλο κοκκινιστό με χυλοπίτες.",den:"Chicken in tomato sauce with Greek egg noodles.",sv:5,dif:2,g:1,
+ ing:[["chicken",1000,"g","c"],["pasta",500,"g","c"],["canned_tomato",400,"g","i"],["onion",1,"pc","i"],["cinnamon",1,"g","o"],["cheese_hard",80,"g","o"],["olive_oil",60,"ml","s"],["salt",12,"g","s"],["pepper_black",1,"g","s"],["water",1500,"ml","s"]],
+ st:[[5,0,"Κόψε το κοτόπουλο σε μερίδες και ψιλόκοψε το κρεμμύδι.","Cut the chicken into portions and chop the onion."],
+  [10,"H","Σοτάρισε το κοτόπουλο στο ελαιόλαδο να ροδίσει από όλες τις πλευρές.","Brown the chicken in the olive oil on all sides."],
+  [3,"M","Πρόσθεσε το κρεμμύδι και σοτάρισε.","Add the onion and sauté."],
+  [3,"H","Ρίξε τη ντομάτα, 1 λίτρο νερό, την κανέλα, το αλάτι και το πιπέρι και φέρε σε βρασμό.","Add the tomatoes, 1 litre of water, cinnamon, salt and pepper and bring to the boil."],
+  [40,"L","Σιγόβρασε σκεπασμένο μέχρι να ψηθεί το κοτόπουλο.","Simmer covered until the chicken is cooked."],
+  [12,"M","Βγάλε το κοτόπουλο, ρίξε τις χυλοπίτες και 500 ml ζεστό νερό και μαγείρεψε ανακατεύοντας μέχρι να μαλακώσουν.","Remove the chicken, add the noodles and 500 ml hot water and cook, stirring, until soft."],
+  [1,0,"Σέρβιρε με το κοτόπουλο και τριμμένο τυρί.","Serve with the chicken and grated cheese."]]});
+
+R({id:"ntomatosoupa",em:"🍅",el:"Ντοματόσουπα με κριθαράκι",en:"Tomato soup with orzo",del:"Ζεστή σούπα με φρέσκια ντομάτα και κριθαράκι.",den:"Warming fresh tomato soup with orzo.",sv:4,dif:1,g:1,
+ ing:[["tomato",6,"pc","c"],["orzo",120,"g","c"],["onion",1,"pc","i"],["tomato_paste",20,"g","o"],["feta",80,"g","o"],["olive_oil",50,"ml","s"],["salt",6,"g","s"],["pepper_black",1,"g","s"],["water",1200,"ml","s"]],
+ st:[[10,0,"Τρίψε τις ντομάτες και ψιλόκοψε το κρεμμύδι.","Grate the tomatoes and chop the onion."],
+  [5,"M","Σοτάρισε το κρεμμύδι στο ελαιόλαδο.","Sauté the onion in the olive oil."],
+  [3,"H","Ρίξε τις ντομάτες, τον πελτέ, το νερό, το αλάτι και το πιπέρι και φέρε σε βρασμό.","Add the tomatoes, paste, water, salt and pepper and bring to the boil."],
+  [10,"L","Σιγόβρασε.","Simmer."],
+  [12,"M","Ρίξε το κριθαράκι και μαγείρεψε ανακατεύοντας μέχρι να μαλακώσει. Σέρβιρε με φέτα.","Add the orzo and cook, stirring, until soft. Serve with feta."]]});
+
+R({id:"patatosalata",em:"🥔",el:"Πατατοσαλάτα",en:"Greek potato salad",del:"Πατάτες με κρεμμύδι, ξίδι, ελαιόλαδο και μαϊντανό.",den:"Potatoes with onion, vinegar, olive oil and parsley.",sv:4,dif:1,g:1,
+ ing:[["potato",1000,"g","c"],["onion",1,"pc","i"],["vinegar",30,"ml","i"],["parsley",15,"g","o"],["olives",60,"g","o"],["olive_oil",80,"ml","s"],["salt",8,"g","s",.5],["pepper_black",1,"g","s"],["water",2500,"ml","s"]],
+ st:[[25,"M","Βράσε τις πατάτες με τη φλούδα σε νερό με το μισό αλάτι μέχρι να μαλακώσουν.","Boil the potatoes in their skins in water with half the salt until tender."],
+  [10,0,"Άφησε να κρυώσουν, ξεφλούδισε και κόψε σε κομμάτια.","Let them cool, peel and cut into pieces."],
+  [5,0,"Ανακάτεψε με το ψιλοκομμένο κρεμμύδι, τον μαϊντανό, τις ελιές, το ξίδι, το ελαιόλαδο, το υπόλοιπο αλάτι και το πιπέρι.","Toss with the chopped onion, parsley, olives, vinegar, olive oil, remaining salt and pepper."]]});
+
+/* ---------- v1.3: quick recipes that fit strict settings ---------- */
+R({id:"aggourontomata",em:"🥗",el:"Αγγουροντομάτα σαλάτα",en:"Tomato and cucumber salad",del:"Η πιο απλή καλοκαιρινή σαλάτα, νηστίσιμη.",den:"The simplest Lenten summer salad.",sv:2,dif:1,g:1,
+ ing:[["tomato",2,"pc","c"],["cucumber",1,"pc","c"],["onion",1,"pc","o"],["oregano",1,"g","o"],["olive_oil",30,"ml","s"],["salt",2,"g","s"]],
+ st:[[7,0,"Κόψε τις ντομάτες σε κομμάτια, το αγγούρι σε ροδέλες και το κρεμμύδι σε λεπτά δαχτυλίδια.","Cut the tomatoes into wedges, the cucumber into slices and the onion into thin rings."],
+  [1,0,"Ανακάτεψε με το ελαιόλαδο, το αλάτι και τη ρίγανη.","Toss with the olive oil, salt and oregano."]]});
+
+R({id:"lahanosalata",em:"🥬",el:"Λαχανοσαλάτα με καρότο",en:"Cabbage and carrot salad",del:"Τραγανή νηστίσιμη σαλάτα με λεμόνι.",den:"Crunchy Lenten salad with lemon.",sv:4,dif:1,g:1,
+ ing:[["cabbage",500,"g","c"],["carrot",2,"pc","i"],["lemon",1,"pc","i"],["olive_oil",50,"ml","s"],["salt",4,"g","s"]],
+ st:[[10,0,"Κόψε το λάχανο σε πολύ λεπτές λωρίδες και τρίψε τα καρότα.","Shred the cabbage very thinly and grate the carrots."],
+  [2,0,"Ανακάτεψε με τον χυμό λεμονιού, το ελαιόλαδο και το αλάτι.","Toss with the lemon juice, olive oil and salt."]]});
+
+R({id:"patates_tiganites",em:"🍟",el:"Πατάτες τηγανητές",en:"Greek fried potatoes",del:"Σπιτικές πατάτες τηγανισμένες σε ελαιόλαδο, με ρίγανη.",den:"Homemade potatoes fried in olive oil with oregano.",sv:3,dif:1,g:1,
+ ing:[["potato",800,"g","c"],["oregano",1,"g","o"],["olive_oil",500,"ml","s",.08],["salt",4,"g","s"]],
+ st:[[8,0,"Καθάρισε και κόψε τις πατάτες σε μπαστουνάκια πάχους 1 cm. Ξέπλυνε και στέγνωσέ τες καλά.","Peel and cut the potatoes into 1 cm sticks. Rinse and dry them well."],
+  [15,"H","Τηγάνισε σε καυτό ελαιόλαδο σε δόσεις μέχρι να ροδίσουν.","Fry in hot olive oil in batches until golden."],
+  [1,0,"Στράγγιξε σε χαρτί κουζίνας και πασπάλισε με αλάτι και ρίγανη.","Drain on kitchen paper and sprinkle with salt and oregano."]]});
+
+R({id:"kolokythakia_vrasta",em:"🥒",el:"Κολοκυθάκια βραστά σαλάτα",en:"Boiled zucchini salad",del:"Ελαφριά νηστίσιμη σαλάτα με λεμόνι και ελαιόλαδο.",den:"Light Lenten salad with lemon and olive oil.",sv:3,dif:1,g:1,
+ ing:[["zucchini",4,"pc","c"],["lemon",1,"pc","i"],["dill",5,"g","o"],["olive_oil",40,"ml","s"],["salt",6,"g","s",.4],["water",2000,"ml","s"]],
+ st:[[3,0,"Πλύνε τα κολοκυθάκια και κόψε τις άκρες.","Wash the zucchini and trim the ends."],
+  [8,"H","Φέρε σε βρασμό το νερό με το αλάτι.","Bring the water to the boil with the salt."],
+  [10,"M","Βράσε τα κολοκυθάκια ολόκληρα μέχρι να μαλακώσουν και στράγγιξε.","Boil the zucchini whole until tender and drain."],
+  [2,0,"Κόψε σε κομμάτια και περιέλουσε με ελαιόλαδο, χυμό λεμονιού και άνηθο.","Cut into pieces and dress with olive oil, lemon juice and dill."]]});
+
+R({id:"avga_matia",em:"🍳",el:"Αυγά μάτια με φέτα",en:"Fried eggs with feta",del:"Αυγά τηγανητά σε ελαιόλαδο με φέτα και ρίγανη.",den:"Eggs fried in olive oil with feta and oregano.",sv:1,dif:1,g:1,
+ ing:[["eggs",2,"pc","c"],["feta",40,"g","o"],["oregano",1,"g","o"],["olive_oil",15,"ml","s"],["salt",1,"g","s"],["pepper_black",1,"g","s"]],
+ st:[[2,"M","Ζέστανε το ελαιόλαδο στο τηγάνι.","Heat the olive oil in the pan."],
+  [4,"M","Σπάσε τα αυγά και μαγείρεψε μέχρι να πήξει το ασπράδι.","Crack in the eggs and cook until the whites are set."],
+  [1,0,"Πασπάλισε με αλάτι, πιπέρι, ρίγανη και θρυμματισμένη φέτα.","Sprinkle with salt, pepper, oregano and crumbled feta."]]});
+
+/* ---------- v1.4: more Greek recipes ---------- */
+R({id:"gigantes",em:"🫘",el:"Γίγαντες πλακί",en:"Baked giant beans (Gigantes plaki)",del:"Γίγαντες στον φούρνο με ντομάτα και μυρωδικά.",den:"Oven-baked giant beans with tomato and herbs.",sv:6,dif:2,g:1,soak:12,
+ ing:[["white_beans",500,"g","c"],["canned_tomato",400,"g","i"],["onion",2,"pc","i"],["carrot",1,"pc","o"],["celery",1,"pc","o"],["parsley",15,"g","o"],["olive_oil",120,"ml","s"],["salt",9,"g","s"],["pepper_black",1,"g","s"],["water",2500,"ml","s"]],
+ st:[[10,0,"Στράγγιξε τους μουλιασμένους γίγαντες. Ψιλόκοψε το κρεμμύδι, το καρότο, το σέλινο και τον μαϊντανό.","Drain the soaked beans. Chop the onion, carrot, celery and parsley."],
+  [40,"M","Βράσε τους γίγαντες σε 2 λίτρα νερό μέχρι να μαλακώσουν σχεδόν και στράγγιξε.","Boil the beans in 2 litres of water until almost tender, then drain."],
+  [8,"M","Σοτάρισε το κρεμμύδι, το καρότο και το σέλινο στο ελαιόλαδο.","Sauté the onion, carrot and celery in the olive oil."],
+  [10,"L","Πρόσθεσε τη ντομάτα, το αλάτι και το πιπέρι και σιγόβρασε.","Add the tomatoes, salt and pepper and simmer."],
+  [5,0,"Ανακάτεψε τους γίγαντες με τη σάλτσα, τον μαϊντανό και 500 ml νερό σε ταψί.","Mix the beans with the sauce, parsley and 500 ml water in a tray."],
+  [50,180,"Ψήσε μέχρι να δέσει η σάλτσα και να ροδίσουν από πάνω.","Bake until the sauce thickens and the top is browned."]]});
+
+R({id:"dolmadakia",em:"🍃",el:"Ντολμαδάκια γιαλαντζί",en:"Stuffed vine leaves (Dolmadakia)",del:"Νηστίσιμα ντολμαδάκια με ρύζι, μυρωδικά και λεμόνι.",den:"Lenten vine leaves stuffed with rice, herbs and lemon.",sv:6,dif:3,g:1,
+ ing:[["vine_leaves",250,"g","c"],["rice",300,"g","c"],["onion",2,"pc","i"],["lemon",2,"pc","i"],["dill",15,"g","o"],["mint",10,"g","o"],["spring_onion",4,"pc","o"],["olive_oil",150,"ml","s"],["salt",7,"g","s"],["pepper_black",1,"g","s"],["water",700,"ml","s"]],
+ st:[[5,"H","Ζεμάτισε τα αμπελόφυλλα σε βραστό νερό και στράγγιξε.","Blanch the vine leaves in boiling water and drain."],
+  [8,"M","Σοτάρισε τα ψιλοκομμένα κρεμμύδια και φρεσκοκρέμμυδα στο μισό ελαιόλαδο.","Sauté the chopped onions and spring onions in half the olive oil."],
+  [5,0,"Ανακάτεψε με το ρύζι, τα ψιλοκομμένα μυρωδικά, το αλάτι και το πιπέρι.","Mix with the rice, chopped herbs, salt and pepper."],
+  [40,0,"Βάλε γέμιση περίπου 10 g σε κάθε φύλλο, δίπλωσε σφιχτά και στρώσε τα στην κατσαρόλα.","Place about 10 g of filling on each leaf, roll tightly and arrange them in the pot."],
+  [45,"L","Πρόσθεσε το νερό, το υπόλοιπο ελαιόλαδο και τον χυμό του ενός λεμονιού, σκέπασε με ένα πιάτο και σιγόβρασε.","Add the water, the remaining olive oil and the juice of one lemon, cover with a plate and simmer."],
+  [15,0,"Άφησε να κρυώσουν και σέρβιρε με τον χυμό του δεύτερου λεμονιού.","Let them cool and serve with the juice of the second lemon."]]});
+
+R({id:"imam",em:"🍆",el:"Ιμάμ μπαϊλντί",en:"Stuffed eggplant (Imam bayildi)",del:"Μελιτζάνες γεμιστές με κρεμμύδια και ντομάτα.",den:"Eggplants stuffed with onions and tomato.",sv:4,dif:2,g:1,
+ ing:[["eggplant",4,"pc","c"],["onion",3,"pc","i"],["tomato",4,"pc","i"],["garlic",4,"pc","i"],["parsley",20,"g","o"],["olive_oil",150,"ml","s"],["salt",8,"g","s"],["pepper_black",1,"g","s"]],
+ st:[[20,0,"Κόψε τις μελιτζάνες στη μέση κατά μήκος, χάραξε τη σάρκα, αλάτισε και άφησε να βγάλουν τα υγρά τους. Ξέπλυνε και στέγνωσε.","Halve the eggplants lengthwise, score the flesh, salt them and let them release their liquid. Rinse and dry."],
+  [12,"M","Τηγάνισε τις μελιτζάνες στο μισό ελαιόλαδο, 6 λεπτά από κάθε πλευρά.","Fry the eggplants in half the olive oil, 6 minutes per side."],
+  [10,"M","Σοτάρισε τα κρεμμύδια σε λεπτές φέτες και το σκόρδο στο υπόλοιπο ελαιόλαδο.","Sauté the thinly sliced onions and the garlic in the remaining olive oil."],
+  [10,"L","Πρόσθεσε τις ντομάτες σε κυβάκια, τον μαϊντανό και το πιπέρι και σιγόβρασε.","Add the diced tomatoes, parsley and pepper and simmer."],
+  [5,0,"Άνοιξε τις μελιτζάνες σε ταψί και γέμισέ τες με τη σάλτσα.","Open the eggplants in a tray and fill them with the sauce."],
+  [40,180,"Ψήσε μέχρι να μαλακώσουν εντελώς.","Bake until completely soft."]]});
+
+R({id:"saganaki",em:"🧀",el:"Σαγανάκι τυρί",en:"Fried cheese (Saganaki)",del:"Τηγανητή κεφαλογραβιέρα με λεμόνι.",den:"Pan-fried hard cheese with lemon.",sv:2,dif:1,g:1,
+ ing:[["cheese_hard",250,"g","c"],["flour",30,"g","i",.5],["lemon",1,"pc","i"],["olive_oil",50,"ml","s",.3]],
+ st:[[2,0,"Βρέξε το τυρί με νερό και αλεύρωσέ το καλά.","Wet the cheese with water and coat it well in flour."],
+  [6,"H","Τηγάνισε στο καυτό ελαιόλαδο, 3 λεπτά από κάθε πλευρά, μέχρι να ροδίσει.","Fry in the hot olive oil, 3 minutes per side, until golden."],
+  [1,0,"Σέρβιρε αμέσως με λεμόνι.","Serve immediately with lemon."]]});
+
+R({id:"bougiourdi",em:"🌶️",el:"Μπουγιουρντί",en:"Baked feta with tomato (Bouyiourdi)",del:"Φέτα στον φούρνο με ντομάτα, πιπεριά και ρίγανη.",den:"Baked feta with tomato, pepper and oregano.",sv:3,dif:1,g:1,
+ ing:[["feta",300,"g","c"],["tomato",2,"pc","c"],["pepper_green",1,"pc","i"],["oregano",1,"g","o"],["olive_oil",30,"ml","s"]],
+ st:[[5,0,"Κόψε τη ντομάτα και την πιπεριά σε λεπτές φέτες.","Slice the tomato and pepper thinly."],
+  [3,0,"Βάλε σε πήλινο σκεύος στρώσεις ντομάτα, φέτα και πιπεριά. Ρίξε το ελαιόλαδο και τη ρίγανη.","Layer tomato, feta and pepper in a clay dish. Add the olive oil and oregano."],
+  [20,200,"Ψήσε μέχρι να μαλακώσει η φέτα και να ροδίσει.","Bake until the feta softens and browns."]]});
+
+R({id:"hortopita",em:"🥧",el:"Χορτόπιτα",en:"Wild greens pie (Hortopita)",del:"Πίτα με χόρτα, φέτα και μυρωδικά.",den:"Pie with wild greens, feta and herbs.",sv:8,dif:2,g:1,
+ ing:[["phyllo",450,"g","c"],["horta",800,"g","c"],["feta",250,"g","i"],["spring_onion",4,"pc","o"],["dill",15,"g","o"],["olive_oil",150,"ml","s"],["salt",3,"g","s"],["pepper_black",1,"g","s"]],
+ st:[[15,0,"Πλύνε και ψιλόκοψε τα χόρτα, τα φρεσκοκρέμμυδα και τον άνηθο. Αλάτισε τα χόρτα και στύψε τα υγρά.","Wash and chop the greens, spring onions and dill. Salt the greens and squeeze out the liquid."],
+  [5,0,"Ανακάτεψε τα χόρτα με τη θρυμματισμένη φέτα, τα μυρωδικά, το πιπέρι και 50 ml ελαιόλαδο.","Mix the greens with the crumbled feta, herbs, pepper and 50 ml olive oil."],
+  [15,0,"Στρώσε σε λαδωμένο ταψί τα μισά φύλλα, λαδώνοντας το καθένα. Άπλωσε τη γέμιση, σκέπασε με τα υπόλοιπα φύλλα λαδωμένα και χάραξε σε κομμάτια.","Lay half the sheets in an oiled tray, oiling each one. Spread the filling, cover with the remaining oiled sheets and score into pieces."],
+  [50,180,"Ψήσε μέχρι να ροδίσει και να γίνει τραγανή.","Bake until golden and crisp."],
+  [15,0,"Άφησε να κρυώσει πριν τη σερβίρεις.","Let it cool before serving."]]});
+
+R({id:"kotopoulo_tigania",em:"🍗",el:"Κοτόπουλο τηγανιά λεμονάτη",en:"Pan-fried lemon chicken",del:"Γρήγορο κοτόπουλο στο τηγάνι με σκόρδο και ρίγανη.",den:"Quick pan-fried chicken with garlic and oregano.",sv:3,dif:1,g:1,
+ ing:[["chicken",600,"g","c"],["lemon",1,"pc","i"],["garlic",2,"pc","i"],["oregano",2,"g","o"],["olive_oil",50,"ml","s"],["salt",5,"g","s"],["pepper_black",1,"g","s"]],
+ st:[[8,0,"Κόψε το κοτόπουλο σε μπουκιές και ψιλόκοψε το σκόρδο.","Cut the chicken into bite-size pieces and chop the garlic."],
+  [8,"H","Ρόδισε το κοτόπουλο στο ελαιόλαδο, ανακατεύοντας.","Brown the chicken in the olive oil, stirring."],
+  [2,"M","Πρόσθεσε το σκόρδο, το αλάτι, το πιπέρι και τη ρίγανη.","Add the garlic, salt, pepper and oregano."],
+  [8,"M","Ρίξε τον χυμό λεμονιού και μαγείρεψε μέχρι να ψηθεί το κοτόπουλο και να δέσει η σάλτσα.","Add the lemon juice and cook until the chicken is done and the sauce thickens."]]});
+
+R({id:"patates_lemonates",em:"🥔",el:"Πατάτες φούρνου λεμονάτες",en:"Greek lemon roast potatoes",del:"Πατάτες στον φούρνο με λεμόνι, σκόρδο και ρίγανη.",den:"Oven potatoes with lemon, garlic and oregano.",sv:4,dif:1,g:1,
+ ing:[["potato",1200,"g","c"],["lemon",2,"pc","i"],["garlic",3,"pc","o"],["oregano",2,"g","o"],["olive_oil",100,"ml","s"],["salt",9,"g","s"],["pepper_black",1,"g","s"],["water",300,"ml","s"]],
+ st:[[10,0,"Καθάρισε και κόψε τις πατάτες σε φέτες κατά μήκος.","Peel the potatoes and cut them into wedges."],
+  [3,0,"Ανακάτεψε σε ταψί με το ελαιόλαδο, τον χυμό λεμονιού, το σκόρδο, τη ρίγανη, το αλάτι, το πιπέρι και το νερό.","Toss in a tray with the olive oil, lemon juice, garlic, oregano, salt, pepper and water."],
+  [50,200,"Ψήσε μέχρι να απορροφηθούν τα υγρά.","Bake until the liquid is absorbed."],
+  [20,220,"Γύρισε τις πατάτες και ψήσε μέχρι να ροδίσουν.","Turn the potatoes and bake until golden."]]});
+
+R({id:"revithada",em:"🥘",el:"Ρεβιθάδα φούρνου",en:"Oven-baked chickpeas (Revithada)",del:"Σιφνέικη ρεβιθάδα σιγοψημένη στον φούρνο.",den:"Sifnos-style chickpeas slow-baked in the oven.",sv:6,dif:1,g:1,soak:12,
+ ing:[["chickpeas",500,"g","c"],["onion",3,"pc","i"],["lemon",1,"pc","o"],["olive_oil",150,"ml","s"],["salt",9,"g","s"],["pepper_black",1,"g","s"],["water",1500,"ml","s"]],
+ st:[[5,0,"Στράγγιξε τα μουλιασμένα ρεβίθια και κόψε τα κρεμμύδια σε φέτες.","Drain the soaked chickpeas and slice the onions."],
+  [15,"H","Βράσε τα ρεβίθια σε νερό, ξάφρισε και στράγγιξε.","Boil the chickpeas in water, skim and drain."],
+  [5,0,"Βάλε τα ρεβίθια, τα κρεμμύδια, το ελαιόλαδο, το αλάτι, το πιπέρι και το νερό σε πήλινο σκεύος με καπάκι.","Put the chickpeas, onions, olive oil, salt, pepper and water in a lidded clay pot."],
+  [180,160,"Ψήσε σκεπασμένο μέχρι να λιώνουν τα ρεβίθια. Σέρβιρε με λεμόνι.","Bake covered until the chickpeas are very soft. Serve with lemon."]]});
+
+R({id:"htipiti",em:"🌶️",el:"Χτυπητή",en:"Spicy feta dip (Htipiti)",del:"Αλοιφή φέτας με ψητή πιπεριά.",den:"Feta dip with charred pepper.",sv:6,dif:1,g:1,
+ ing:[["feta",300,"g","c"],["pepper_green",2,"pc","i"],["vinegar",10,"ml","o"],["olive_oil",40,"ml","s"]],
+ st:[[10,"H","Ψήσε τις πιπεριές ολόκληρες σε αντικολλητικό τηγάνι, γυρίζοντας, μέχρι να καψαλιστούν.","Char the whole peppers in a non-stick pan, turning, until blistered."],
+  [10,0,"Ξεφλούδισε, βγάλε τους σπόρους και ψιλόκοψε τις πιπεριές.","Peel, deseed and finely chop the peppers."],
+  [5,0,"Λιώσε τη φέτα με πιρούνι και ανακάτεψε με τις πιπεριές, το ελαιόλαδο και το ξίδι.","Mash the feta with a fork and mix with the peppers, olive oil and vinegar."]]});
+
+R({id:"skordalia",em:"🧄",el:"Σκορδαλιά",en:"Garlic potato dip (Skordalia)",del:"Νηστίσιμη αλοιφή πατάτας με σκόρδο.",den:"Lenten potato and garlic dip.",sv:6,dif:1,g:1,
+ ing:[["potato",600,"g","c"],["garlic",5,"pc","c"],["vinegar",40,"ml","i"],["olive_oil",150,"ml","s"],["salt",6,"g","s",.5],["water",2000,"ml","s"]],
+ st:[[25,"M","Βράσε τις πατάτες με τη φλούδα σε νερό με το μισό αλάτι μέχρι να μαλακώσουν.","Boil the potatoes in their skins in water with half the salt until tender."],
+  [5,0,"Ξεφλούδισε τις πατάτες όσο είναι ζεστές.","Peel the potatoes while still hot."],
+  [10,0,"Λιώσε τις πατάτες με το τριμμένο σκόρδο και το υπόλοιπο αλάτι, προσθέτοντας σιγά σιγά το ελαιόλαδο και το ξίδι.","Mash the potatoes with the grated garlic and the remaining salt, adding the olive oil and vinegar gradually."]]});
+
+R({id:"pilafi",em:"🍚",el:"Πιλάφι",en:"Greek rice pilaf",del:"Απλό αφράτο πιλάφι, συνοδευτικό για κάθε φαγητό.",den:"Simple fluffy rice pilaf, a side for any meal.",sv:4,dif:1,g:1,
+ ing:[["rice",300,"g","c"],["butter",30,"g","o"],["lemon",1,"pc","o"],["olive_oil",30,"ml","s"],["salt",6,"g","s"],["water",750,"ml","s"]],
+ st:[[5,"H","Φέρε σε βρασμό το νερό με το αλάτι και το ελαιόλαδο.","Bring the water to the boil with the salt and olive oil."],
+  [15,"L","Ρίξε το ρύζι, σκέπασε και σιγόβρασε χωρίς να ανακατεύεις μέχρι να απορροφηθούν τα υγρά.","Add the rice, cover and simmer without stirring until the liquid is absorbed."],
+  [10,0,"Κατέβασε από τη φωτιά, πρόσθεσε το βούτυρο και άφησε σκεπασμένο να φουσκώσει. Σέρβιρε με λεμόνι.","Remove from the heat, add the butter and let it rest covered. Serve with lemon."]]});
+
+R({id:"psarosoupa",em:"🐟",el:"Ψαρόσουπα",en:"Greek fish soup (Psarosoupa)",del:"Σούπα με ψάρι, λαχανικά και λεμόνι.",den:"Soup with fish, vegetables and lemon.",sv:5,dif:2,g:1,
+ ing:[["cod",800,"g","c"],["potato",3,"pc","i"],["carrot",2,"pc","i"],["onion",2,"pc","i"],["lemon",2,"pc","i"],["celery",2,"pc","o"],["olive_oil",80,"ml","s"],["salt",10,"g","s"],["pepper_black",1,"g","s"],["water",2000,"ml","s"]],
+ st:[[10,0,"Κόψε τις πατάτες και τα καρότα σε κομμάτια, το κρεμμύδι στα τέσσερα και το σέλινο σε κομμάτια.","Cut the potatoes and carrots into chunks, the onions into quarters and the celery into pieces."],
+  [20,"M","Βράσε τα λαχανικά στο νερό με το αλάτι μέχρι να μαλακώσουν.","Boil the vegetables in the water with the salt until tender."],
+  [15,"L","Πρόσθεσε το ψάρι και σιγόβρασε μέχρι να ψηθεί.","Add the fish and simmer until cooked."],
+  [2,0,"Πρόσθεσε το ελαιόλαδο, τον χυμό λεμονιού και το πιπέρι. Σέρβιρε το ψάρι με τα λαχανικά και τη σούπα χωριστά.","Add the olive oil, lemon juice and pepper. Serve the fish with the vegetables, and the soup separately."]]});
+
+R({id:"manitaria",em:"🍄",el:"Μανιτάρια σοτέ με σκόρδο",en:"Garlic mushrooms",del:"Γρήγορα νηστίσιμα μανιτάρια με λεμόνι και μαϊντανό.",den:"Quick Lenten mushrooms with lemon and parsley.",sv:2,dif:1,g:1,
+ ing:[["mushrooms",500,"g","c"],["garlic",3,"pc","i"],["lemon",1,"pc","o"],["parsley",10,"g","o"],["olive_oil",40,"ml","s"],["salt",3,"g","s"],["pepper_black",1,"g","s"]],
+ st:[[8,0,"Καθάρισε και κόψε τα μανιτάρια σε φέτες. Ψιλόκοψε το σκόρδο και τον μαϊντανό.","Clean and slice the mushrooms. Chop the garlic and parsley."],
+  [10,"H","Σοτάρισε τα μανιτάρια στο ελαιόλαδο μέχρι να εξατμιστούν τα υγρά και να ροδίσουν.","Sauté the mushrooms in the olive oil until the liquid evaporates and they brown."],
+  [2,"M","Πρόσθεσε το σκόρδο, το αλάτι και το πιπέρι.","Add the garlic, salt and pepper."],
+  [1,0,"Περιέλουσε με χυμό λεμονιού και πασπάλισε με μαϊντανό.","Pour over the lemon juice and sprinkle with parsley."]]});
+
+R({id:"fakoryzo",em:"🍲",el:"Φακόρυζο",en:"Lentils with rice (Fakoryzo)",del:"Νηστίσιμο φαγητό με φακές, ρύζι και τσιγαρισμένο κρεμμύδι.",den:"Lenten lentils and rice with fried onion.",sv:4,dif:1,g:1,
+ ing:[["lentils",250,"g","c"],["rice",150,"g","c"],["onion",2,"pc","i"],["cumin",1,"g","o"],["olive_oil",80,"ml","s"],["salt",7,"g","s"],["pepper_black",1,"g","s"],["water",1500,"ml","s"]],
+ st:[[5,0,"Ξέπλυνε τις φακές και κόψε τα κρεμμύδια σε λεπτές φέτες.","Rinse the lentils and slice the onions thinly."],
+  [20,"M","Βράσε τις φακές στο νερό μέχρι να μισομαλακώσουν.","Boil the lentils in the water until half-tender."],
+  [18,"L","Πρόσθεσε το ρύζι, το αλάτι, το πιπέρι και το κύμινο και σιγόβρασε σκεπασμένο μέχρι να απορροφηθούν τα υγρά.","Add the rice, salt, pepper and cumin and simmer covered until the liquid is absorbed."],
+  [12,"M","Στο μεταξύ τηγάνισε τα κρεμμύδια στο ελαιόλαδο μέχρι να καραμελώσουν.","Meanwhile fry the onions in the olive oil until caramelised.",1],
+  [1,0,"Σέρβιρε το φακόρυζο με τα κρεμμύδια και το λάδι από πάνω.","Serve topped with the onions and their oil."]]});
+
 /* ---------- Derived recipe data ---------- */
+const isOven=h=>typeof h==="number"&&h>0;
 function gramsOf(id,q,u){ const d=INGM[id]; if(!d) return 0; if(u==="g") return q; if(u==="ml") return q*d.dens; return q*(d.pw||0); }
 RECIPES.forEach(r=>{
   r.total = r.st.reduce((a,s)=>a+(s[4]?0:s[0]),0);
-  r.oven = r.st.some(s=>typeof s[1]==="number");
+  r.oven = r.st.some(s=>isOven(s[1]));
   const t=[0,0,0,0,0,0];
   r.ing.forEach(x=>{ const d=INGM[x[0]]; const g=gramsOf(x[0],x[1],x[2])*(x[4]==null?1:x[4]); d.n.forEach((v,i)=>t[i]+=v*g/100); });
   r.nut = t.map(v=>v/r.sv);
@@ -504,43 +910,82 @@ const RM = Object.fromEntries(RECIPES.map(r=>[r.id,r]));
 /* ---------- State ---------- */
 const S = {
   lang: LS.get("lang","el"),
-  selected: new Set(LS.get("selected",[])),
-  staples: new Set(LS.get("staples",["olive_oil","salt","pepper_black","oregano"])),
+  text: LS.get("text",""), tokens: [], selected: new Set(),
   prefs: Object.assign({diet:"none",allergies:[],maxMin:0,oven:true}, LS.get("prefs",{})),
   saved: LS.get("saved",[]),
   shop: LS.get("shop",[]),
   history: LS.get("history",[]),
   screen:"ing", cat:"all", q:"", recipeId:null, servings:null, tab:"ing", bestIdx:0, prevScreen:"rec"
 };
-function persist(){ LS.set("lang",S.lang); LS.set("selected",[...S.selected]); LS.set("staples",[...S.staples]); LS.set("prefs",S.prefs); LS.set("saved",S.saved); LS.set("shop",S.shop); LS.set("history",S.history); }
+function persist(){ LS.set("lang",S.lang); LS.set("text",S.text); LS.set("prefs",S.prefs); LS.set("saved",S.saved); LS.set("shop",S.shop); LS.set("history",S.history); }
 const t = k => T[S.lang][k];
 const L = o => o[S.lang] || o.el;
 const esc = s => String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const norm = s => (s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/ς/g,"σ").trim();
 
+/* ---------- Ingredient text parsing (Greek, English, Greeklish) ---------- */
+const GD=[["ου","u"],["αυ","av"],["ευ","ev"],["ει","i"],["οι","i"],["υι","i"],["αι","e"],["μπ","b"],["ντ","d"],["γκ","g"],["γγ","g"]];
+const GC={α:"a",β:"v",γ:"g",δ:"d",ε:"e",ζ:"z",η:"i",θ:"8",ι:"i",κ:"k",λ:"l",μ:"m",ν:"n",ξ:"x",ο:"o",π:"p",ρ:"r",σ:"s",τ:"t",υ:"i",φ:"f",χ:"x",ψ:"ps",ω:"o"};
+const LR=[["ph","f"],["th","8"],["ch","x"],["kh","x"],["ks","x"],["h","x"],["ou","u"],["ei","i"],["oi","i"],["y","i"],["ai","e"],["mp","b"],["nt","d"],["gk","g"],["gg","g"],["w","o"],["c","k"],["q","k"]];
+function key(s){
+  s=norm(s); GD.forEach(([a,b])=>s=s.split(a).join(b));
+  s=[...s].map(c=>GC[c]!==undefined?GC[c]:c).join("");
+  LR.forEach(([a,b])=>s=s.split(a).join(b));
+  return s.replace(/[^a-z0-9]/g,"").replace(/(.)\1+/g,"$1");
+}
+function lev(a,b){ const m=a.length,n=b.length; if(Math.abs(m-n)>2) return 9; let p=Array.from({length:n+1},(_,j)=>j);
+  for(let i=1;i<=m;i++){ const c=[i]; for(let j=1;j<=n;j++) c[j]=Math.min(p[j]+1,c[j-1]+1,p[j-1]+(a[i-1]===b[j-1]?0:1)); p=c; } return p[n]; }
+const stem=k=>k.replace(/(es|is|as|os|ia|a|e|i|o|u|s)$/,"");
+INGS.forEach(i=>{ i.keys=[...new Set([i.name.el,i.name.en,...i.al].map(key))]; });
+function matchIng(tok){
+  const k=key(tok); if(k.length<2) return null;
+  let best=null,bs=99;
+  for(const i of INGS){ if(i.hidden) continue;
+    for(const ik of i.keys){ let s=99;
+      if(ik===k) s=0;
+      else if(stem(ik)===stem(k)&&stem(k).length>=3) s=1;
+      else if((k.length>=5&&ik.startsWith(k)&&k.length>=ik.length*.6)||(ik.length>=5&&k.startsWith(ik))) s=1.5;
+      else { const d=lev(ik,k), n=k.length, lim=n<5?0:n<=7?1:2; if(d<=lim) s=1+d; }
+      if(s<bs){ bs=s; best=i.id; } } }
+  return best;
+}
+function splitText(txt){ return txt.replace(/\s+(και|and|kai|ke)\s+/gi,",").split(/[,;\n·]+/).map(s=>s.trim()).filter(Boolean); }
+function setText(v){
+  S.text=v; S.tokens=splitText(v).map(raw=>({raw,id:matchIng(raw)}));
+  S.selected=new Set(S.tokens.filter(x=>x.id).map(x=>x.id)); S.bestIdx=0; persist();
+}
+const endsSep=()=>/[,;\n·]\s*$/.test(S.text)||!S.text.trim();
+
 /* ---------- Matching algorithm ---------- */
-const W = {c:5,i:3,s:.5};
-function has(id){ return id==="water" || S.selected.has(id) || S.staples.has(id); }
+const W = {c:5,i:3,s:0};
+function has(id){ return id==="water" || S.selected.has(id); }
 function subFor(id){ return (SUBS[id]||[]).find(x=>has(x)); }
 function recentlyCooked(id){ const wk=7*864e5; return S.history.some(h=>h.id===id && Date.now()-h.at<wk); }
 function timeFit(total){ const m=S.prefs.maxMin; if(!m||total<=m) return 1; return Math.max(0,1-(total-m)/m); }
-function allowed(r){
+/* Diet and allergens are never relaxed (safety). Time and oven can be relaxed to always show several recipes. */
+function hardOK(r){
   const p=S.prefs;
   if(p.diet==="vegetarian"&&!r.vegetarian) return false;
   if(p.diet==="vegan"&&!r.vegan) return false;
   if(p.diet==="lenten"&&!r.lenten) return false;
   if(p.allergies.some(a=>r.alg.includes(a))) return false;
-  if(!p.oven&&r.oven) return false;
-  if(p.maxMin&&(r.soak||r.total>p.maxMin*2)) return false;
   return true;
 }
+function softIssues(r){
+  const p=S.prefs, s=[];
+  if(!p.oven&&r.oven) s.push(t("needsOven"));
+  if(p.maxMin&&r.total>p.maxMin) s.push(t("overTime")(r.total));
+  if(p.maxMin&&r.soak) s.push(t("needsSoak"));
+  return s;
+}
+function allowed(r){ return hardOK(r)&&!softIssues(r).length; }
 function evaluate(r){
-  let num=0,den=0,mc=0,mi=0; const missing=[],subs=[];
+  let num=0,den=0,mc=0,mi=0; const missing=[],subs=[],missKey=[];
   for(const [id,,,role] of r.ing){
     if(role==="o") continue;
     const w=W[role]; den+=w; let s=0;
     if(has(id)) s=1;
-    else { const sb=subFor(id); if(sb){ s=.7; subs.push([id,sb]); } else { missing.push(id); if(role==="c") mc++; else if(role==="i") mi++; } }
+    else { const sb=subFor(id); if(sb){ s=.7; subs.push([id,sb]); } else { missing.push(id); if(role==="c") mc++; else if(role==="i") mi++; if(role!=="s") missKey.push(id); } }
     num+=w*s;
   }
   const C=den?num/den:0;
@@ -549,18 +994,27 @@ function evaluate(r){
   const T_=timeFit(r.total), V=recentlyCooked(r.id)?0:1;
   const score=.60*C+.17*P+.10*r.g+.08*T_+.05*V;
   const coreOwned=r.ing.some(x=>x[3]==="c"&&(S.selected.has(x[0])||subFor(x[0])));
-  let group=null;
+  let group="idea";
   if(mc===0&&mi===0&&used>0) group="now";
   else if(mc+mi<=2&&mc<=1&&C>=.5&&coreOwned) group="almost";
-  return {r,C,P,score,group,missing,subs,used,match:Math.round(C*100)};
+  else if(used>0) group="other";
+  return {r,C,P,score,group,missing,missKey,subs,used,match:Math.round(C*100)};
 }
+const MIN_RESULTS=4;
 function results(){
-  const all=RECIPES.filter(allowed).map(evaluate).filter(e=>e.group).sort((a,b)=>b.score-a.score);
-  return {now:all.filter(e=>e.group==="now"), almost:all.filter(e=>e.group==="almost")};
+  const hard=RECIPES.filter(hardOK).map(r=>{ const e=evaluate(r); e.issues=softIssues(r); return e; }).sort((a,b)=>b.score-a.score);
+  const all=hard.filter(e=>!e.issues.length);
+  const now=all.filter(e=>e.group==="now"), almost=all.filter(e=>e.group==="almost");
+  const other=all.filter(e=>e.group==="other").slice(0,6);
+  let have=now.length+almost.length+other.length;
+  const ideas=have<MIN_RESULTS?all.filter(e=>e.group==="idea").sort((a,b)=>a.r.total-b.r.total).slice(0,MIN_RESULTS-have):[];
+  have+=ideas.length;
+  const relaxed=have<MIN_RESULTS?hard.filter(e=>e.issues.length).sort((a,b)=>(b.used>0)-(a.used>0)||b.score-a.score).slice(0,MIN_RESULTS-have):[];
+  return {now,almost,other,ideas,relaxed,allowedCount:all.length,hardCount:hard.length};
 }
 function reasonFor(e){
   const p=[];
-  if(e.group==="now"&&!e.subs.length) p.push(t("haveAll")); else if(e.subs.length) p.push(t("subUsed"));
+  if(e.group==="now"&&!e.subs.length) p.push(t("haveAll")); else if(e.group==="now"&&e.subs.length) p.push(t("subUsed"));
   if(e.used>1) p.push(t("usesN")(e.used));
   if(e.r.total<=30) p.push(t("quick")(e.r.total));
   if(p.length<2&&e.r.g===1) p.push(t("greek"));
@@ -578,13 +1032,27 @@ function qtyText(id,q,u,k){
   if(u==="ml"&&r>=1000) return (r/1000).toLocaleString(S.lang==="el"?"el-GR":"en-GB")+" L";
   return r+" "+u;
 }
+function scaleStep(txt,k){
+  if(k===1) return txt;
+  const loc=S.lang==="el"?"el-GR":"en-GB";
+  return txt.replace(/(περίπου |about )?(\d+(?:[.,]\d+)?)\s*(g|ml|λίτρα|λίτρο|litres|litre)(?![\p{L}])/gu,(m,ab,num,u)=>{
+    if(ab) return m;
+    const v=parseFloat(num.replace(",","."))*k;
+    if(u==="g"||u==="ml"){ const r=v>=100?Math.round(v/10)*10:v>=20?Math.round(v/5)*5:Math.max(1,Math.round(v));
+      return u==="ml"&&r>=1000?(r/1000).toLocaleString(loc,{maximumFractionDigits:1})+(S.lang==="el"?" λίτρα":" litres"):r+" "+u; }
+    const l=Math.round(v*4)/4;
+    if(l<1) return Math.round(v*1000/50)*50+" ml";
+    return l.toLocaleString(loc,{maximumFractionDigits:2})+" "+(S.lang==="el"?(l===1?"λίτρο":"λίτρα"):(l===1?"litre":"litres"));
+  });
+}
 function heatTag(h){
-  if(typeof h==="number") return `<span class="heat h-O">♨ ${t("oven")} ${h} °C</span>`;
+  if(isOven(h)) return `<span class="heat h-O">♨ ${t("oven")} ${h} °C</span>`;
   const m={0:["h-0","🔪",t("heat0")],L:["h-L","🔥",t("heatL")],M:["h-M","🔥🔥",t("heatM")],H:["h-H","🔥🔥🔥",t("heatH")]}[h];
   return `<span class="heat ${m[0]}">${m[1]} ${m[2]}</span>`;
 }
-function heatSpeech(h){ return typeof h==="number"?t("oven")+" "+h+" °C":({0:t("heat0"),L:t("heatL"),M:t("heatM"),H:t("heatH")})[h]; }
+function heatSpeech(h){ return isOven(h)?t("oven")+" "+h+" °C":({0:t("heat0"),L:t("heatL"),M:t("heatM"),H:t("heatH")})[h]; }
 function dietTags(r){ let s=""; if(r.vegan) s+=`<span class="tag">${t("vegan")}</span>`; else if(r.vegetarian) s+=`<span class="tag">${t("vegetarian")}</span>`; if(r.lenten) s+=`<span class="tag a">${t("lenten")}</span>`; return s; }
+function issueTags(e){ return (e.issues||[]).map(x=>`<span class="tag a">${esc(x)}</span>`).join(""); }
 function toast(m){ const el=document.getElementById("toast"); el.textContent=m; el.classList.add("show"); clearTimeout(toast._t); toast._t=setTimeout(()=>el.classList.remove("show"),2200); }
 function isSaved(id){ return S.saved.some(x=>x.id===id); }
 function toggleSave(id){ if(isSaved(id)) S.saved=S.saved.filter(x=>x.id!==id); else { S.saved.unshift({id,at:Date.now()}); toast(t("saved")); } persist(); render(); }
@@ -592,57 +1060,72 @@ function go(scr){ stopSpeech(); S.screen=scr; render(); window.scrollTo(0,0); }
 function openRecipe(id){ S.prevScreen=S.screen==="detail"?S.prevScreen:S.screen; S.recipeId=id; S.servings=RM[id].sv; S.tab="ing"; go("detail"); }
 
 /* ---------- Screens ---------- */
-function vIngredients(){
-  const q=norm(S.q);
-  let list=INGS.filter(i=>!i.hidden);
-  if(q) list=list.filter(i=>[i.name.el,i.name.en,...i.al].some(n=>norm(n).includes(q)));
-  else if(S.cat!=="all") list=list.filter(i=>i.cat===S.cat);
-  const chips=`<button class="chip ${S.cat==="all"?"on":""}" data-cat="all"><span class="e">🧺</span>${t("all")}</button>`+
-    CATS.map(c=>`<button class="chip ${S.cat===c.id&&!q?"on":""}" data-cat="${c.id}"><span class="e">${c.e}</span>${L(c)}</button>`).join("");
+function ingBox(){
+  return `<div class="ingbox"><div class="ibhead"><b>🧺 ${t("myIng")}: <span id="ingCount">${S.selected.size}</span></b>
+    <button id="clearText" class="del">✕ ${t("clearAll")}</button></div>
+    <textarea id="ingText" rows="2" placeholder="${esc(t("ph"))}" autocomplete="off" autocapitalize="off" spellcheck="false">${esc(S.text)}</textarea>
+    <div id="sugg" class="sugg">${vSugg()}</div><div id="parsed" class="parsed">${vParsed()}</div></div>`;
+}
+function vParsed(){
+  const toks=S.tokens.slice(); if(!endsSep()&&toks.length&&!toks[toks.length-1].id) toks.pop();
+  const seen=new Set();
+  return toks.map(x=>{ if(!x.id) return `<span class="pchip bad">✕ ${esc(x.raw)} <small>${t("notRec")}</small></span>`;
+    if(seen.has(x.id)) return ""; seen.add(x.id); const nm=L(INGM[x.id].name);
+    return `<span class="pchip ok">✓ ${INGM[x.id].em} ${esc(nm)}${norm(nm)!==norm(x.raw)?` <small>← ${esc(x.raw)}</small>`:""}</span>`; }).join("");
+}
+function vSugg(){
+  if(endsSep()) return "";
+  const part=S.text.split(/[,;\n·]/).pop().trim(), k=key(part), n=norm(part); if(k.length<2) return "";
+  return INGS.filter(i=>!i.hidden&&!S.selected.has(i.id)&&(i.keys.some(x=>x.startsWith(k))||[i.name.el,i.name.en,...i.al].some(x=>norm(x).includes(n))))
+    .slice(0,6).map(i=>`<button class="sg" data-sug="${i.id}">${i.em} ${esc(L(i.name))}</button>`).join("");
+}
+function vGrid(){
+  const list=INGS.filter(i=>!i.hidden&&(S.cat==="all"||i.cat===S.cat));
   const other=S.lang==="el"?"en":"el";
-  const tiles=list.map(i=>{ const st=S.staples.has(i.id), on=S.selected.has(i.id)||st;
-    return `<button class="tile ${on?"on":""}" data-ing="${i.id}">${st?`<span class="always">★ ${t("always")}</span>`:""}<span class="ck">✓</span>
-    <div class="pic c-${i.cat}">${i.em}</div><div class="nm"><b>${esc(L(i.name))}</b><small>${esc(i.name[other])}</small></div></button>`;}).join("");
-  return `<div class="search"><span>🔍</span><input id="q" type="search" placeholder="${t("search")}" value="${esc(S.q)}" autocomplete="off"></div>
-    <div class="chips">${chips}</div>
-    ${list.length?`<div class="grid">${tiles}</div>`:`<div class="empty"><div class="e">🔎</div>${t("noMatchSearch")}</div>`}`;
+  return `<div class="grid">`+list.map(i=>`<button class="tile ${S.selected.has(i.id)?"on":""}" data-ing="${i.id}"><span class="ck">✓</span>
+    <div class="pic c-${i.cat}">${i.em}</div><div class="nm"><b>${esc(L(i.name))}</b><small>${esc(i.name[other])}</small></div></button>`).join("")+`</div>`;
+}
+function vIngredients(){
+  const chips=`<button class="chip ${S.cat==="all"?"on":""}" data-cat="all"><span class="e">🧺</span>${t("all")}</button>`+
+    CATS.map(c=>`<button class="chip ${S.cat===c.id?"on":""}" data-cat="${c.id}"><span class="e">${c.e}</span>${L(c)}</button>`).join("");
+  return `${ingBox()}<div class="chips">${chips}</div><div id="gridWrap">${vGrid()}</div>`;
 }
 function actionBar(){
   if(S.screen!=="ing") return "";
   const n=S.selected.size;
-  return `<div class="abar"><button class="cnt" id="openSel"><b>🧺 ${t("myIng")}: ${n} ›</b><small>${t("hintPick")}</small></button>
+  return `<div class="abar"><button class="cnt" id="openSel"><b>🧺 ${t("myIng")}: ${n} ›</b><small>${t("hintType")}</small></button>
     <button class="btn" id="findBtn" ${n?"":"disabled"}>${t("find")} →</button></div>`;
 }
 function rCard(e){
-  const r=e.r, miss=e.missing.filter(id=>!INGM[id]||true);
+  const r=e.r, miss=e.missKey, more=miss.length>3?" +"+(miss.length-3):"";
   return `<button class="card rcard" data-open="${r.id}"><div class="em">${r.em}</div><div class="b"><b>${esc(L({el:r.el,en:r.en}))}</b>
     <div class="sub">${esc(L({el:r.del,en:r.den}))}</div>
     <div class="meta"><span>⏱ ${r.total} ${t("min")}</span><span>🔥 ${Math.round(r.nut[0])} kcal</span>${r.soak?`<span>💧 ${r.soak}h</span>`:""}</div>
-    ${e.group==="almost"?`<span class="tag t">🛒 ${t("missing")}: ${miss.map(id=>esc(L(INGM[id].name))).join(", ")}</span>`:dietTags(r)}
-    </div><div class="rr">${ring(e.match)}</div></button>`;
+    ${e.group!=="now"&&miss.length?`<span class="tag t">🛒 ${t("missing")}: ${miss.slice(0,3).map(id=>esc(L(INGM[id].name))).join(", ")}${more}</span>`:dietTags(r)}
+    ${issueTags(e)}</div><div class="rr">${ring(e.match)}</div></button>`;
 }
-function vResults(){
-  if(!S.selected.size) return `<div class="empty"><div class="e">🧺</div>${t("pickFirst")}<br><br><button class="btn" data-go="ing">${t("navIng")}</button></div>`;
-  const {now,almost}=results();
+function vResults(){ return `${ingBox()}<div id="reslist">${vResList()}</div>`; }
+function vResList(){
+  if(!S.selected.size) return `<div class="empty"><div class="e">🧺</div>${t("typeFirst")}</div>`;
+  const {now,almost,other,ideas,relaxed,allowedCount,hardCount}=results();
   const p=S.prefs, dl={none:"",vegetarian:t("dVeg"),vegan:t("dVegan"),lenten:t("dLent")}[p.diet];
   const fbar=`<div class="fbar"><span class="tag">🧺 ${t("withIng")}: ${S.selected.size}</span>${p.maxMin?`<span class="tag">⏱ ≤ ${p.maxMin} ${t("min")}</span>`:""}${dl?`<span class="tag a">${dl}</span>`:""}
     ${p.allergies.length?`<span class="tag t">🚫 ${p.allergies.map(a=>L(ALG[a])).join(", ")}</span>`:""}<button class="tag" data-go="set" style="border:1px solid var(--line)">⚙ ${t("edit")}</button></div>`;
-  if(!now.length&&!almost.length) return fbar+`<div class="empty"><div class="e">🤔</div><b>${t("noRes")}</b><br>${t("noResHint")}<br><br><button class="btn" data-go="ing">${t("navIng")}</button></div>`;
-  const pool=now.length?now:almost;
+  if(!hardCount) return fbar+`<div class="empty"><div class="e">🤔</div><b>${t("noRes")}</b><br>${t("noHard")}</div>`;
+  const pool=now.length?now:almost.length?almost:other.length?other:ideas.length?ideas:relaxed;
   const e=pool[S.bestIdx%pool.length], r=e.r;
   const best=`<div class="card best"><div class="hero"><span class="ribbon">★ ${t("best")}</span>${r.em}</div><div class="body">
     <div class="row" style="justify-content:space-between;align-items:flex-start"><div><h3 class="ttl">${esc(L({el:r.el,en:r.en}))}</h3><div class="sub">${esc(L({el:r.del,en:r.den}))}</div></div>${ring(e.match)}</div>
     <div class="meta"><span>⏱ ${r.total} ${t("min")}</span><span>🔥 ${Math.round(r.nut[0])} ${t("kcal")}</span><span>👥 ${r.sv}</span></div>
-    ${dietTags(r)}
+    ${dietTags(r)}${issueTags(e)}
     <div class="reason">🌿 ${esc(reasonFor(e))}</div>
-    ${e.group==="almost"?`<div class="hint">🛒 ${t("missing")}: ${e.missing.map(id=>esc(L(INGM[id].name))).join(", ")}</div>`:""}
+    ${e.group!=="now"&&e.missKey.length?`<div class="hint">🛒 ${t("missing")}: ${e.missKey.map(id=>esc(L(INGM[id].name))).join(", ")}</div>`:""}
     <div class="row"><button class="btn" data-open="${r.id}" style="flex:1">🍴 ${t("view")}</button>
     <button class="btn ghost" data-save="${r.id}">${isSaved(r.id)?"❤️":"🤍"} ${t("save")}</button>
     ${pool.length>1?`<button class="btn ghost" id="another" title="${t("another")}">🔄</button>`:""}</div></div></div>`;
-  const restNow=now.filter(x=>x!==e), restAlmost=almost.filter(x=>x!==e);
-  return fbar+best+
-    (restNow.length?`<h2 class="sec">🍃 ${t("cookNow")}</h2><div class="rlist">${restNow.map(rCard).join("")}</div>`:"")+
-    (restAlmost.length?`<h2 class="sec terra">🛒 ${t("almost")}</h2><div class="rlist">${restAlmost.map(rCard).join("")}</div>`:"");
+  const sec=(arr,cls,label)=>{ const a=arr.filter(x=>x!==e); return a.length?`<h2 class="sec ${cls}">${label}</h2><div class="rlist">${a.map(rCard).join("")}</div>`:""; };
+  return fbar+best+sec(now,"","🍃 "+t("cookNow"))+sec(almost,"terra","🛒 "+t("almost"))+sec(other,"terra","🧩 "+t("otherG"))+sec(ideas,"","💡 "+t("ideasG"))+
+    (relaxed.length?`<div class="hint">ℹ ${t("relaxedN")}</div>`+sec(relaxed,"terra","⚠ "+t("relaxedG")):"");
 }
 function vDetail(){
   const r=RM[S.recipeId]; if(!r) return "";
@@ -655,14 +1138,15 @@ function vDetail(){
     body=`<ul class="ilist card">`+r.ing.filter(x=>x[0]!=="water").map(([id,q,u,role])=>{
       const d=INGM[id]; let dot,extra="";
       if(has(id)) dot=`<span class="dot y">✓</span>`;
+      else if(role==="s"){ dot=`<span class="dot b">·</span>`; extra=` <small style="color:var(--muted)">(${t("basic")})</small>`; }
       else if(subMap[id]){ dot=`<span class="dot s">⇄</span>`; extra=`<br><small style="color:#7A5410">${t("subst")}: ${esc(L(INGM[subMap[id]].name))}</small>`; }
       else dot=`<span class="dot n">✕</span>`;
       if(role==="o"){ extra+=` <small style="color:var(--muted)">(${t("opt")})</small>`; if(dietBad(id)) extra+=`<br><small style="color:var(--terra)">${t("omit")}</small>`; }
       return `<li>${dot}<span>${d.em} ${esc(L(d.name))}${extra}</span><span class="q">${qtyText(id,q,u,k)}</span></li>`;}).join("")+`</ul>
       <div style="margin-top:12px"><button class="btn terra" id="addMissing" style="width:100%">🛒 ${t("addMissing")}</button></div>`;
   } else if(S.tab==="steps"){
-    body=(k!==1?`<div class="note">ℹ ${t("scaled")}</div>`:"")+`<ol class="steps">`+r.st.map((s,i)=>`<li data-step="${i}"><span class="n">${i+1}</span><div>
-      ${heatTag(s[1])} <span class="heat h-0">⏱ ${s[0]} ${t("min")}${s[4]?" · "+t("parallel"):""}</span><div>${esc(S.lang==="el"?s[2]:s[3])}</div></div></li>`).join("")+`</ol>`;
+    body=`<ol class="steps">`+r.st.map((s,i)=>`<li data-step="${i}"><span class="n">${i+1}</span><div>
+      ${heatTag(s[1])} <span class="heat h-0">⏱ ${s[0]} ${t("min")}${s[4]?" · "+t("parallel"):""}</span><div>${esc(scaleStep(S.lang==="el"?s[2]:s[3],k))}</div></div></li>`).join("")+`</ol>`;
   } else {
     const ref=[2000,50,260,70,25,6], cols=["#C97B5A","#4F6B2A","#E0B03A","#C65A4A","#5E8B65","#5B7FA6"], un=["kcal","g","g","g","g","g"];
     body=`<div class="card" style="padding:12px 14px"><b>${t("nutTitle")}</b><div class="nut">`+r.nut.map((v,i)=>`<div class="r"><span>${t("n"+i)}</span><div class="bar"><i style="width:${Math.min(100,v/ref[i]*100)}%;background:${cols[i]}"></i></div><b style="text-align:right">${i===0?Math.round(v):v.toFixed(1)} ${un[i]}</b></div>`).join("")+
@@ -703,14 +1187,12 @@ function itemLabel(it){ if(it.ing){ const d=INGM[it.ing]; return (d?L(d.name):it
 function vSettings(){
   const p=S.prefs;
   const o=(grp,val,label,on)=>`<button class="opt ${on?"on":""}" data-${grp}="${val}">${label}</button>`;
-  const stapleIds=["olive_oil","salt","pepper_black","oregano","garlic","onion","lemon","tomato_paste","vinegar","flour","rice","pasta"];
   return `<div class="set"><h2 class="sec">⚙ ${t("setTitle")}</h2>
    <h3>${t("language")}</h3><div class="opts">${o("lang","el","Ελληνικά",S.lang==="el")}${o("lang","en","English",S.lang==="en")}</div>
    <h3>${t("diet")}</h3><div class="opts">${o("diet","none",t("dNone"),p.diet==="none")}${o("diet","vegetarian",t("dVeg"),p.diet==="vegetarian")}${o("diet","vegan",t("dVegan"),p.diet==="vegan")}${o("diet","lenten",t("dLent"),p.diet==="lenten")}</div>
    <h3>${t("allerg")}</h3><div class="opts">${Object.keys(ALG).map(a=>o("alg",a,L(ALG[a]),p.allergies.includes(a))).join("")}</div>
    <h3>${t("time")}</h3><div class="opts">${[0,20,30,45,60].map(m=>o("time",m,m?"≤ "+m+" "+t("min"):t("any"),p.maxMin===m)).join("")}</div>
    <h3>${t("equip")}</h3><div class="swrow"><span>♨ ${t("ovenHave")}</span><button class="sw ${p.oven?"on":""}" id="ovenSw"></button></div>
-   <h3>${t("staples")}</h3>${stapleIds.map(id=>`<div class="swrow"><span>${INGM[id].em} ${esc(L(INGM[id].name))}</span><button class="sw ${S.staples.has(id)?"on":""}" data-staple="${id}"></button></div>`).join("")}
    <h3>${t("about")}</h3><div class="card" style="padding:12px 14px;font-size:14px"><b>What to Cook</b> v${VERSION}<br>Created by: Michael Gerontides<br><span class="note">${t("localNote")}</span></div>
    <button class="btn sm ghost" id="resetAll" style="margin-top:12px;color:var(--terra)">${t("resetAll")}</button></div>`;
 }
@@ -733,14 +1215,16 @@ function render(){
 }
 function bind(){
   const $=s=>document.getElementById(s);
-  const q=$("q");
-  if(q){ q.oninput=()=>{ S.q=q.value; const pos=q.selectionStart; render(); const n=$("q"); n.focus(); try{n.setSelectionRange(pos,pos);}catch(e){} }; }
-  document.querySelectorAll("[data-cat]").forEach(b=>b.onclick=()=>{ S.cat=b.dataset.cat; S.q=""; render(); });
-  document.querySelectorAll("[data-ing]").forEach(b=>b.onclick=()=>{ const id=b.dataset.ing;
-    if(S.staples.has(id)){ toast(t("alwaysToast")); return; }
-    S.selected.has(id)?S.selected.delete(id):S.selected.add(id); S.bestIdx=0; persist(); render(); });
+  const ta=$("ingText");
+  if(ta){ ta.oninput=()=>{ setText(ta.value); refreshDyn(); };
+    ta.onkeydown=ev=>{ if(ev.key==="Enter"){ ev.preventDefault(); if(S.text.trim()&&!endsSep()){ ta.value=S.text.replace(/\s*$/,"")+", "; setText(ta.value); refreshDyn(); } } }; }
+  if($("clearText")) $("clearText").onclick=()=>{ setText(""); render(); };
+  document.querySelectorAll("[data-sug]").forEach(b=>b.onclick=()=>{ const parts=S.text.split(/([,;\n·])/); parts[parts.length-1]=(parts.length>1?" ":"")+L(INGM[b.dataset.sug].name);
+    setText(parts.join("")+", "); refreshDyn(true); const x=$("ingText"); if(x){ x.focus(); x.setSelectionRange(x.value.length,x.value.length); } });
+  document.querySelectorAll("[data-cat]").forEach(b=>b.onclick=()=>{ S.cat=b.dataset.cat; render(); });
+  document.querySelectorAll("[data-ing]").forEach(b=>b.onclick=()=>toggleIng(b.dataset.ing));
   if($("findBtn")) $("findBtn").onclick=()=>{ S.bestIdx=0; go("rec"); };
-  if($("openSel")) $("openSel").onclick=openSheet;
+  if($("openSel")) $("openSel").onclick=()=>{ window.scrollTo(0,0); const x=$("ingText"); if(x){ x.focus(); x.setSelectionRange(x.value.length,x.value.length); } };
   document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>go(b.dataset.go));
   document.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>openRecipe(b.dataset.open));
   document.querySelectorAll("[data-save]").forEach(b=>b.onclick=ev=>{ ev.stopPropagation(); toggleSave(b.dataset.save); });
@@ -764,32 +1248,33 @@ function bind(){
   document.querySelectorAll("[data-alg]").forEach(b=>b.onclick=()=>{ const a=b.dataset.alg, s=new Set(S.prefs.allergies); s.has(a)?s.delete(a):s.add(a); S.prefs.allergies=[...s]; persist(); render(); });
   document.querySelectorAll("[data-time]").forEach(b=>b.onclick=()=>{ S.prefs.maxMin=+b.dataset.time; persist(); render(); });
   if($("ovenSw")) $("ovenSw").onclick=()=>{ S.prefs.oven=!S.prefs.oven; persist(); render(); };
-  document.querySelectorAll("[data-staple]").forEach(b=>b.onclick=()=>{ const id=b.dataset.staple; if(S.staples.has(id)) S.staples.delete(id); else { S.staples.add(id); S.selected.delete(id); } persist(); render(); });
   if($("resetAll")) $("resetAll").onclick=()=>{ if(confirm(t("resetQ"))){ Object.keys(localStorage).filter(k=>k.startsWith("wtc_")).forEach(k=>localStorage.removeItem(k)); location.reload(); } };
 }
 document.getElementById("langBtn").onclick=()=>{ S.lang=S.lang==="el"?"en":"el"; persist(); render(); };
 
-/* ---------- Selected ingredients sheet ---------- */
-function openSheet(){
-  const sh=document.getElementById("sheet");
-  const draw=()=>{ const ids=[...S.selected];
-    sh.innerHTML=`<div class="sheetbox"><div class="row" style="justify-content:space-between"><b style="font-size:18px">🧺 ${t("myIng")}: ${ids.length}</b><button class="btn sm ghost" id="shClose">${t("close")}</button></div>
-      ${ids.length?`<div class="selchips">${ids.map(id=>`<span class="selchip">${INGM[id].em} ${esc(L(INGM[id].name))} <button data-rm="${id}" class="del">✕</button></span>`).join("")}</div>
-      <button class="btn sm ghost" id="shClear" style="color:var(--terra)">${t("clearAll")}</button>`:`<p class="note">${t("selectedNone")}</p>`}</div>`;
-    sh.querySelector("#shClose").onclick=close;
-    sh.querySelectorAll("[data-rm]").forEach(b=>b.onclick=()=>{ S.selected.delete(b.dataset.rm); persist(); draw(); });
-    const c=sh.querySelector("#shClear"); if(c) c.onclick=()=>{ S.selected.clear(); persist(); draw(); };
-  };
-  const close=()=>{ sh.classList.remove("show"); render(); };
-  sh.onclick=e=>{ if(e.target===sh) close(); };
-  draw(); sh.classList.add("show");
+/* ---------- Text box sync ---------- */
+function toggleIng(id){
+  let raws;
+  if(S.selected.has(id)) raws=S.tokens.filter(x=>x.id!==id).map(x=>x.raw);
+  else { const tk=S.tokens.slice(); if(!endsSep()&&tk.length&&!tk[tk.length-1].id) tk.pop(); raws=tk.map(x=>x.raw); raws.push(L(INGM[id].name)); }
+  setText(raws.length?raws.join(", ")+", ":""); refreshDyn(true);
+}
+let resTimer=null;
+function refreshDyn(syncBox){
+  const $=s=>document.getElementById(s);
+  if(syncBox&&$("ingText")) $("ingText").value=S.text;
+  if($("sugg")) $("sugg").innerHTML=vSugg();
+  if($("parsed")) $("parsed").innerHTML=vParsed();
+  if($("ingCount")) $("ingCount").textContent=S.selected.size;
+  if(S.screen==="ing"){ $("gridWrap").innerHTML=vGrid(); $("actionBar").innerHTML=actionBar(); bind(); }
+  else if(S.screen==="rec"){ bind(); clearTimeout(resTimer); resTimer=setTimeout(()=>{ const r=$("reslist"); if(r){ r.innerHTML=vResList(); bind(); } },350); }
 }
 
 /* ---------- Shopping list ---------- */
 function addMissing(){
   const r=RM[S.recipeId], e=evaluate(r), k=S.servings/r.sv;
   const opt=r.ing.filter(x=>x[3]==="o"&&!has(x[0])).map(x=>x[0]);
-  const ids=[...e.missing,...opt].filter(id=>id!=="water");
+  const ids=[...e.missKey,...opt].filter(id=>id!=="water");
   let n=0;
   ids.forEach(id=>{ if(S.shop.some(x=>x.ing===id&&!x.done)) return; const x=r.ing.find(y=>y[0]===id);
     S.shop.unshift({id:Date.now()+id,ing:id,qty:qtyText(id,x[1],x[2],k),from:r.id,done:false}); n++; });
@@ -809,7 +1294,7 @@ function speak(){
   if(speaking){ stopSpeech(); render(); return; }
   const r=RM[S.recipeId], k=S.servings/r.sv, el=S.lang==="el";
   const parts=[el?r.el:r.en, t("tIng")+": "+r.ing.filter(x=>x[0]!=="water").map(x=>L(INGM[x[0]].name)+", "+qtyText(x[0],x[1],x[2],k)).join(". ")];
-  r.st.forEach((s,i)=>parts.push((i+1)+". "+heatSpeech(s[1])+", "+s[0]+" "+(el?"λεπτά":"minutes")+". "+(el?s[2]:s[3])));
+  r.st.forEach((s,i)=>parts.push((i+1)+". "+heatSpeech(s[1])+", "+s[0]+" "+(el?"λεπτά":"minutes")+". "+scaleStep(el?s[2]:s[3],k)));
   const u=new SpeechSynthesisUtterance(parts.join(". "));
   u.lang=el?"el-GR":"en-GB";
   const v=speechSynthesis.getVoices().find(v=>v.lang&&v.lang.toLowerCase().startsWith(el?"el":"en"));
@@ -819,6 +1304,8 @@ function speak(){
 }
 
 /* ---------- Start on the ingredient screen (Mockup #1) ---------- */
+["selected","staples"].forEach(k=>{ try{ localStorage.removeItem("wtc_"+k); }catch(e){} });
+setText(S.text);
 S.screen="ing";
 render();
 </script>
