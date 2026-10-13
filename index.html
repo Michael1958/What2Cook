@@ -37,6 +37,7 @@ main{flex:1;padding:4px 14px 210px}
 .tile .nm b{display:block;font-size:14px;font-weight:600}
 .tile .nm small{color:var(--muted);font-size:11.5px}
 .tile .ck{position:absolute;top:6px;right:6px;width:26px;height:26px;border-radius:50%;background:var(--olive);color:#fff;display:none;align-items:center;justify-content:center;font-size:15px;border:2px solid #fff}
+.tile .pic .noicon{font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.3px}
 .tile.on{border-color:var(--olive);outline:2px solid var(--olive)}
 .tile.on .ck{display:flex}
 .c-veg{background:#EAF1DE}.c-meat{background:#F7E1DA}.c-fish{background:#DDEBF0}.c-dairy{background:#F8F0DA}.c-grains{background:#F4E9D2}.c-legumes{background:#EFE3D6}.c-herbs{background:#E2EEDC}.c-pantry{background:#EFE9DD}
@@ -169,7 +170,7 @@ h2.sec.terra{color:var(--terra)}
 
 <script>
 "use strict";
-const VERSION = "1.5";
+const VERSION = "1.6";
 
 /* ---------- Storage (browser only, on this device) ---------- */
 const LS = {
@@ -239,69 +240,69 @@ I("tomato","veg","Ντομάτα","Tomato","🍅",[18,.9,3.9,.2,1.2,.01],{pw:150
 I("onion","veg","Κρεμμύδι","Onion","🧅",[40,1.1,9.3,.1,1.7,0],{pw:110,al:["κρεμμυδια","kremmydi","kremidi","onions"]});
 I("garlic","veg","Σκόρδο","Garlic","🧄",[149,6.4,33,.5,2.1,.04],{pw:5,unit:{el:"σκελίδες",en:"cloves"},al:["skordo"]});
 I("spinach","veg","Σπανάκι","Spinach","🥬",[23,2.9,3.6,.4,2.2,.2],{al:["spanaki"]});
-I("zucchini","veg","Κολοκυθάκι","Zucchini","🥒",[17,1.2,3.1,.3,1,.02],{pw:200,al:["κολοκυθακια","kolokythaki","kolokithakia","courgette"]});
+I("zucchini","veg","Κολοκυθάκι","Zucchini","",[17,1.2,3.1,.3,1,.02],{pw:200,al:["κολοκυθακια","kolokythaki","kolokithakia","courgette"]});
 I("eggplant","veg","Μελιτζάνα","Eggplant","🍆",[25,1,5.9,.2,3,0],{pw:300,al:["μελιτζανες","melitzana","aubergine"]});
 I("pepper_green","veg","Πιπεριά","Green pepper","🫑",[20,.9,4.6,.2,1.7,0],{pw:150,al:["piperia","bell pepper","πιπεριες"]});
 I("potato","veg","Πατάτα","Potato","🥔",[77,2,17,.1,2.2,.01],{pw:200,al:["πατατες","patata","patates","potatoes"]});
 I("carrot","veg","Καρότο","Carrot","🥕",[41,.9,9.6,.2,2.8,.17],{pw:80,al:["καροτα","karoto","carrots"]});
-I("celery","veg","Σέλινο","Celery","🌱",[16,.7,3,.2,1.6,.2],{pw:40,unit:{el:"κοτσάνια",en:"stalks"},alg:["celery"],al:["selino"]});
+I("celery","veg","Σέλινο","Celery","",[16,.7,3,.2,1.6,.2],{pw:40,unit:{el:"κοτσάνια",en:"stalks"},alg:["celery"],al:["selino"]});
 I("lemon","veg","Λεμόνι","Lemon","🍋",[29,1.1,9.3,.3,2.8,0],{pw:60,al:["λεμονια","lemoni"]});
 I("cucumber","veg","Αγγούρι","Cucumber","🥒",[15,.7,3.6,.1,.5,0],{pw:300,al:["αγγουρι","agouri","aggouri"]});
-I("green_beans","veg","Φασολάκια","Green beans","🫛",[31,1.8,7,.2,2.7,0],{al:["fasolakia"]});
-I("spring_onion","veg","Φρεσκοκρέμμυδο","Spring onion","🌱",[32,1.8,7.3,.2,2.6,.04],{pw:15,al:["φρεσκα κρεμμυδακια","freskokremmydo","scallion"]});
-I("peas","veg","Αρακάς","Peas","🟢",[81,5.4,14.5,.4,5.7,0],{al:["arakas"]});
+I("green_beans","veg","Φασολάκια","Green beans","",[31,1.8,7,.2,2.7,0],{al:["fasolakia"]});
+I("spring_onion","veg","Φρεσκοκρέμμυδο","Spring onion","",[32,1.8,7.3,.2,2.6,.04],{pw:15,al:["φρεσκα κρεμμυδακια","freskokremmydo","scallion"]});
+I("peas","veg","Αρακάς","Peas","🫛",[81,5.4,14.5,.4,5.7,0],{al:["arakas"]});
 I("chicken","meat","Κοτόπουλο","Chicken","🍗",[120,22.5,0,2.6,0,.15],{an:"meat",al:["kotopoulo","κοτα"]});
-I("beef_mince","meat","Κιμάς","Minced meat","🥩",[254,17.2,0,20,0,.17],{an:"meat",al:["kimas","mince","ground beef"]});
-I("tuna","fish","Τόνος (κονσέρβα)","Canned tuna","🥫",[198,29,0,8,0,.9],{an:"fish",alg:["fish"],al:["tonos","tonnos"]});
+I("beef_mince","meat","Κιμάς","Minced meat","",[254,17.2,0,20,0,.17],{an:"meat",al:["kimas","mince","ground beef"]});
+I("tuna","fish","Τόνος (κονσέρβα)","Canned tuna","",[198,29,0,8,0,.9],{an:"fish",alg:["fish"],al:["tonos","tonnos"]});
 I("cod","fish","Μπακαλιάρος","Cod","🐟",[82,18,0,.7,0,.15],{an:"fish",alg:["fish"],al:["bakaliaros","ψαρι","fish"]});
 I("shrimp","fish","Γαρίδες","Shrimp","🦐",[85,20,0,.5,0,.5],{an:"shell",alg:["crust"],al:["garides","prawns"]});
 I("eggs","dairy","Αυγά","Eggs","🥚",[143,12.6,.7,9.5,0,.36],{pw:60,an:"egg",alg:["egg"],al:["αυγο","avga","egg"]});
-I("feta","dairy","Φέτα","Feta","🧀",[264,14.2,4.1,21.3,0,2.8],{an:"dairy",alg:["milk"],al:["τυρι","tyri","tiri","cheese"]});
-I("yogurt","dairy","Γιαούρτι","Yogurt","🥛",[73,10,3.6,2,0,.1],{an:"dairy",alg:["milk"],al:["giaourti","yoghurt"]});
+I("feta","dairy","Φέτα","Feta","",[264,14.2,4.1,21.3,0,2.8],{an:"dairy",alg:["milk"],al:["τυρι","tyri","tiri","cheese"]});
+I("yogurt","dairy","Γιαούρτι","Yogurt","",[73,10,3.6,2,0,.1],{an:"dairy",alg:["milk"],al:["giaourti","yoghurt"]});
 I("cheese_hard","dairy","Κεφαλοτύρι / γραβιέρα","Hard cheese","🧀",[392,28,.5,31,0,2.5],{an:"dairy",alg:["milk"],al:["κεφαλοτυρι","γραβιερα","kefalotyri","graviera","parmesan"]});
 I("rice","grains","Ρύζι","Rice","🍚",[360,6.6,79,.6,1.3,0],{al:["ryzi","rizi"]});
-I("orzo","grains","Κριθαράκι","Orzo","🌾",[357,12.5,72,1.5,3,0],{alg:["gluten"],al:["kritharaki"]});
+I("orzo","grains","Κριθαράκι","Orzo","",[357,12.5,72,1.5,3,0],{alg:["gluten"],al:["kritharaki"]});
 I("pasta","grains","Μακαρόνια","Pasta","🍝",[357,12.5,72,1.5,3,0],{alg:["gluten"],al:["ζυμαρικα","makaronia","spaghetti","σπαγγετι"]});
 I("bread","grains","Ψωμί","Bread","🍞",[265,9,49,3.2,2.7,1.2],{alg:["gluten"],al:["psomi"]});
-I("trahanas","grains","Τραχανάς","Trahanas","🌾",[350,12,68,3,3,1],{an:"dairy",alg:["gluten","milk"],al:["trahanas","trachanas"]});
-I("flour","grains","Αλεύρι","Flour","🌾",[364,10,76,1,2.7,0],{alg:["gluten"],al:["alevri"]});
-I("lentils","legumes","Φακές","Lentils","🫘",[352,24.6,63,1.1,10.7,0],{al:["fakes"]});
+I("trahanas","grains","Τραχανάς","Trahanas","",[350,12,68,3,3,1],{an:"dairy",alg:["gluten","milk"],al:["trahanas","trachanas"]});
+I("flour","grains","Αλεύρι","Flour","",[364,10,76,1,2.7,0],{alg:["gluten"],al:["alevri"]});
+I("lentils","legumes","Φακές","Lentils","",[352,24.6,63,1.1,10.7,0],{al:["fakes"]});
 I("white_beans","legumes","Φασόλια","White beans","🫘",[333,23.4,60,.9,15,0],{al:["fasolia","beans"]});
-I("chickpeas","legumes","Ρεβίθια","Chickpeas","🫘",[364,19,61,6,17,0],{al:["revithia"]});
-I("split_peas","legumes","Φάβα","Yellow split peas","🟡",[341,24,60,1.2,25,0],{al:["fava"]});
-I("black_eyed","legumes","Μαυρομάτικα","Black-eyed peas","🫘",[336,23.5,60,1.3,10.6,0],{al:["mavromatika"]});
-I("dill","herbs","Άνηθος","Dill","🌿",[43,3.5,7,1.1,2.1,.15],{al:["anithos","anitho"]});
+I("chickpeas","legumes","Ρεβίθια","Chickpeas","",[364,19,61,6,17,0],{al:["revithia"]});
+I("split_peas","legumes","Φάβα","Yellow split peas","",[341,24,60,1.2,25,0],{al:["fava"]});
+I("black_eyed","legumes","Μαυρομάτικα","Black-eyed peas","",[336,23.5,60,1.3,10.6,0],{al:["mavromatika"]});
+I("dill","herbs","Άνηθος","Dill","",[43,3.5,7,1.1,2.1,.15],{al:["anithos","anitho"]});
 I("parsley","herbs","Μαϊντανός","Parsley","🌿",[36,3,6.3,.8,3.3,.14],{al:["maintanos","μαιντανος"]});
-I("mint","herbs","Δυόσμος","Mint","🌿",[70,3.8,15,.9,8,.08],{al:["dyosmos","diosmos"]});
-I("oregano","herbs","Ρίγανη","Oregano","🌿",[265,9,69,4.3,42.5,.06],{al:["rigani"]});
-I("cinnamon","herbs","Κανέλα","Cinnamon","🟤",[247,4,81,1.2,53,0],{al:["kanela"]});
-I("pepper_black","herbs","Πιπέρι","Black pepper","⚫",[251,10.4,64,3.3,25,.05],{al:["piperi","pepper"]});
-I("olive_oil","pantry","Ελαιόλαδο","Olive oil","🫒",[884,0,0,100,0,0],{dens:.92,al:["elaiolado","ladi","λαδι","oil"]});
+I("mint","herbs","Δυόσμος","Mint","",[70,3.8,15,.9,8,.08],{al:["dyosmos","diosmos"]});
+I("oregano","herbs","Ρίγανη","Oregano","",[265,9,69,4.3,42.5,.06],{al:["rigani"]});
+I("cinnamon","herbs","Κανέλα","Cinnamon","",[247,4,81,1.2,53,0],{al:["kanela"]});
+I("pepper_black","herbs","Πιπέρι","Black pepper","",[251,10.4,64,3.3,25,.05],{al:["piperi","pepper"]});
+I("olive_oil","pantry","Ελαιόλαδο","Olive oil","",[884,0,0,100,0,0],{dens:.92,al:["elaiolado","ladi","λαδι","oil"]});
 I("salt","pantry","Αλάτι","Salt","🧂",[0,0,0,0,0,100],{al:["alati"]});
-I("tomato_paste","pantry","Πελτές ντομάτας","Tomato paste","🥫",[82,4.3,19,.5,4.1,.15],{al:["peltes","πελτε"]});
+I("tomato_paste","pantry","Πελτές ντομάτας","Tomato paste","",[82,4.3,19,.5,4.1,.15],{al:["peltes","πελτε"]});
 I("canned_tomato","pantry","Ντομάτα κονσέρβα","Canned tomatoes","🥫",[32,1.6,7,.3,1.9,.03],{al:["ντοματακια","ψιλοκομμενη ντοματα","κονκασε","passata"]});
-I("vinegar","pantry","Ξίδι","Vinegar","🍶",[18,0,.04,0,0,0],{dens:1,al:["xidi"]});
+I("vinegar","pantry","Ξίδι","Vinegar","",[18,0,.04,0,0,0],{dens:1,al:["xidi"]});
 I("olives","pantry","Ελιές","Olives","🫒",[230,1.6,6,23,3,4],{al:["elies","kalamata"]});
-I("water","pantry","Νερό","Water","💧",[0,0,0,0,0,0],{hidden:true});
-I("cabbage","veg","Λάχανο","Cabbage","🥬",[25,1.3,5.8,.1,2.5,.05],{pw:1000,al:["lahano","laxano","λαχανο λευκο","white cabbage"]});
-I("cauliflower","veg","Κουνουπίδι","Cauliflower","🥦",[25,1.9,5,.3,2,.08],{pw:800,al:["kounoupidi","kounoupidia","κουνουπιδια"]});
-I("leek","veg","Πράσο","Leek","🌱",[61,1.5,14,.3,1.8,.05],{pw:200,al:["πρασα","praso","prasa","leeks"]});
-I("okra","veg","Μπάμιες","Okra","🫛",[33,1.9,7,.2,3.2,.02],{al:["μπαμια","bamies","mpamies","bamia","ladies fingers"]});
-I("artichoke","veg","Αγκινάρα","Artichoke","🌼",[47,3.3,10.5,.2,5.4,.24],{pw:120,al:["αγκιναρες","aginara","agkinares","agginares","artichokes","καρδιες αγκιναρας"]});
-I("horta","veg","Χόρτα","Wild greens","🍃",[30,2.5,5,.4,3,.1],{al:["horta","xorta","βλιτα","vlita","ραδικια","radikia","σταμναγκαθι","greens","wild greens"]});
+I("water","pantry","Νερό","Water","",[0,0,0,0,0,0],{hidden:true});
+I("cabbage","veg","Λάχανο","Cabbage","",[25,1.3,5.8,.1,2.5,.05],{pw:1000,al:["lahano","laxano","λαχανο λευκο","white cabbage"]});
+I("cauliflower","veg","Κουνουπίδι","Cauliflower","",[25,1.9,5,.3,2,.08],{pw:800,al:["kounoupidi","kounoupidia","κουνουπιδια"]});
+I("leek","veg","Πράσο","Leek","",[61,1.5,14,.3,1.8,.05],{pw:200,al:["πρασα","praso","prasa","leeks"]});
+I("okra","veg","Μπάμιες","Okra","",[33,1.9,7,.2,3.2,.02],{al:["μπαμια","bamies","mpamies","bamia","ladies fingers"]});
+I("artichoke","veg","Αγκινάρα","Artichoke","",[47,3.3,10.5,.2,5.4,.24],{pw:120,al:["αγκιναρες","aginara","agkinares","agginares","artichokes","καρδιες αγκιναρας"]});
+I("horta","veg","Χόρτα","Wild greens","",[30,2.5,5,.4,3,.1],{al:["horta","xorta","βλιτα","vlita","ραδικια","radikia","σταμναγκαθι","greens","wild greens"]});
 I("mushrooms","veg","Μανιτάρια","Mushrooms","🍄",[22,3.1,3.3,.3,1,.01],{al:["μανιταρι","manitaria","manitari","πλευρωτους","pleurotus","champignon","champignons","mushroom"]});
-I("vine_leaves","veg","Αμπελόφυλλα","Vine leaves","🍃",[93,5.6,17,2.1,11,2.5],{al:["αμπελοφυλλο","ampelofylla","ampelofila","κληματοφυλλα","klimatofila","grape leaves","vine leaf"]});
-I("pork","meat","Χοιρινό","Pork","🍖",[196,27,0,9.5,0,.15],{an:"meat",al:["xoirino","hirino","χοιρινη μπριζολα","χοιρινες μπριζολες","pork chops","brizoles"]});
+I("vine_leaves","veg","Αμπελόφυλλα","Vine leaves","",[93,5.6,17,2.1,11,2.5],{al:["αμπελοφυλλο","ampelofylla","ampelofila","κληματοφυλλα","klimatofila","grape leaves","vine leaf"]});
+I("pork","meat","Χοιρινό","Pork","",[196,27,0,9.5,0,.15],{an:"meat",al:["xoirino","hirino","χοιρινη μπριζολα","χοιρινες μπριζολες","pork chops","brizoles"]});
 I("lamb","meat","Αρνί","Lamb","🍖",[230,18,0,17.5,0,.17],{an:"meat",al:["arni","αρνακι","arnaki","αρνισιο","μπουτι αρνιου"]});
 I("beef","meat","Μοσχάρι","Beef","🥩",[170,26,0,7,0,.15],{an:"meat",al:["mosxari","moschari","μοσχαρισιο","beef stew","κρεας","kreas"]});
 I("squid","fish","Καλαμάρια","Squid","🦑",[92,15.6,3.1,1.4,0,.11],{an:"shell",alg:["mollusc"],al:["καλαμαρι","καλαμαρακια","kalamari","kalamaria","kalamarakia","calamari","σουπιες","soupies","cuttlefish"]});
-I("sardines","fish","Σαρδέλες","Sardines","🐟",[150,21,0,7,0,.2],{an:"fish",alg:["fish"],al:["σαρδελα","sardeles","sardela","γαυρος","gavros","anchovies","fresh anchovies"]});
+I("sardines","fish","Σαρδέλες","Sardines","",[150,21,0,7,0,.2],{an:"fish",alg:["fish"],al:["σαρδελα","sardeles","sardela","γαυρος","gavros","anchovies","fresh anchovies"]});
 I("milk","dairy","Γάλα","Milk","🥛",[64,3.3,4.8,3.6,0,.11],{dens:1.03,an:"dairy",alg:["milk"],al:["gala","γαλα πληρες","fresh milk"]});
 I("butter","dairy","Βούτυρο","Butter","🧈",[717,.9,.1,81,0,.03],{an:"dairy",alg:["milk"],al:["voutyro","voutiro","βουτυρο αγελαδος"]});
-I("phyllo","grains","Φύλλο κρούστας","Phyllo pastry","🫓",[299,7.1,52.6,6,1.9,1.2],{alg:["gluten"],al:["φυλλο","fyllo","fillo","filo","phyllo","φυλλο πιτας","χωριατικο φυλλο","pastry sheets"]});
-I("rusk","grains","Παξιμάδι","Barley rusk","🥖",[380,12,72,3,10,1.2],{pw:60,alg:["gluten"],al:["παξιμαδια","paximadi","paximadia","κριθαροκουλουρα","dakos rusk"]});
-I("nutmeg","herbs","Μοσχοκάρυδο","Nutmeg","🌰",[525,5.8,49,36,21,.04],{al:["moschokarydo","mosxokarido"]});
-I("cumin","herbs","Κύμινο","Cumin","🫙",[375,17.8,44,22,10.5,.4],{al:["kymino","kimino"]});
+I("phyllo","grains","Φύλλο κρούστας","Phyllo pastry","",[299,7.1,52.6,6,1.9,1.2],{alg:["gluten"],al:["φυλλο","fyllo","fillo","filo","phyllo","φυλλο πιτας","χωριατικο φυλλο","pastry sheets"]});
+I("rusk","grains","Παξιμάδι","Barley rusk","",[380,12,72,3,10,1.2],{pw:60,alg:["gluten"],al:["παξιμαδια","paximadi","paximadia","κριθαροκουλουρα","dakos rusk"]});
+I("nutmeg","herbs","Μοσχοκάρυδο","Nutmeg","",[525,5.8,49,36,21,.04],{al:["moschokarydo","mosxokarido"]});
+I("cumin","herbs","Κύμινο","Cumin","",[375,17.8,44,22,10.5,.4],{al:["kymino","kimino"]});
 
 /* Extra names people commonly type: Greek spellings, plurals, Greeklish and English */
 const EXTRA_AL={
@@ -920,6 +921,7 @@ const S = {
 function persist(){ LS.set("lang",S.lang); LS.set("text",S.text); LS.set("prefs",S.prefs); LS.set("saved",S.saved); LS.set("shop",S.shop); LS.set("history",S.history); }
 const t = k => T[S.lang][k];
 const L = o => o[S.lang] || o.el;
+const ic = d => d&&d.em ? d.em+" " : "";
 const esc = s => String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const norm = s => (s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/ς/g,"σ").trim();
 
@@ -1071,19 +1073,19 @@ function vParsed(){
   const seen=new Set();
   return toks.map(x=>{ if(!x.id) return `<span class="pchip bad">✕ ${esc(x.raw)} <small>${t("notRec")}</small></span>`;
     if(seen.has(x.id)) return ""; seen.add(x.id); const nm=L(INGM[x.id].name);
-    return `<span class="pchip ok">✓ ${INGM[x.id].em} ${esc(nm)}${norm(nm)!==norm(x.raw)?` <small>← ${esc(x.raw)}</small>`:""}</span>`; }).join("");
+    return `<span class="pchip ok">✓ ${ic(INGM[x.id])}${esc(nm)}${norm(nm)!==norm(x.raw)?` <small>← ${esc(x.raw)}</small>`:""}</span>`; }).join("");
 }
 function vSugg(){
   if(endsSep()) return "";
   const part=S.text.split(/[,;\n·]/).pop().trim(), k=key(part), n=norm(part); if(k.length<2) return "";
   return INGS.filter(i=>!i.hidden&&!S.selected.has(i.id)&&(i.keys.some(x=>x.startsWith(k))||[i.name.el,i.name.en,...i.al].some(x=>norm(x).includes(n))))
-    .slice(0,6).map(i=>`<button class="sg" data-sug="${i.id}">${i.em} ${esc(L(i.name))}</button>`).join("");
+    .slice(0,6).map(i=>`<button class="sg" data-sug="${i.id}">${ic(i)}${esc(L(i.name))}</button>`).join("");
 }
 function vGrid(){
   const list=INGS.filter(i=>!i.hidden&&(S.cat==="all"||i.cat===S.cat));
   const other=S.lang==="el"?"en":"el";
   return `<div class="grid">`+list.map(i=>`<button class="tile ${S.selected.has(i.id)?"on":""}" data-ing="${i.id}"><span class="ck">✓</span>
-    <div class="pic c-${i.cat}">${i.em}</div><div class="nm"><b>${esc(L(i.name))}</b><small>${esc(i.name[other])}</small></div></button>`).join("")+`</div>`;
+    <div class="pic c-${i.cat}">${i.em||`<span class="noicon">No Icon</span>`}</div><div class="nm"><b>${esc(L(i.name))}</b><small>${esc(i.name[other])}</small></div></button>`).join("")+`</div>`;
 }
 function vIngredients(){
   const chips=`<button class="chip ${S.cat==="all"?"on":""}" data-cat="all"><span class="e">🧺</span>${t("all")}</button>`+
@@ -1142,7 +1144,7 @@ function vDetail(){
       else if(subMap[id]){ dot=`<span class="dot s">⇄</span>`; extra=`<br><small style="color:#7A5410">${t("subst")}: ${esc(L(INGM[subMap[id]].name))}</small>`; }
       else dot=`<span class="dot n">✕</span>`;
       if(role==="o"){ extra+=` <small style="color:var(--muted)">(${t("opt")})</small>`; if(dietBad(id)) extra+=`<br><small style="color:var(--terra)">${t("omit")}</small>`; }
-      return `<li>${dot}<span>${d.em} ${esc(L(d.name))}${extra}</span><span class="q">${qtyText(id,q,u,k)}</span></li>`;}).join("")+`</ul>
+      return `<li>${dot}<span>${ic(d)}${esc(L(d.name))}${extra}</span><span class="q">${qtyText(id,q,u,k)}</span></li>`;}).join("")+`</ul>
       <div style="margin-top:12px"><button class="btn terra" id="addMissing" style="width:100%">🛒 ${t("addMissing")}</button></div>`;
   } else if(S.tab==="steps"){
     body=`<ol class="steps">`+r.st.map((s,i)=>`<li data-step="${i}"><span class="n">${i+1}</span><div>
