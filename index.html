@@ -930,6 +930,95 @@ R({id:"fakoryzo",em:"🍲",el:"Φακόρυζο",en:"Lentils with rice (Fakoryzo
   [12,"M","Στο μεταξύ τηγάνισε τα κρεμμύδια στο ελαιόλαδο μέχρι να καραμελώσουν.","Meanwhile fry the onions in the olive oil until caramelised.",1],
   [1,0,"Σέρβιρε το φακόρυζο με τα κρεμμύδια και το λάδι από πάνω.","Serve topped with the onions and their oil."]]});
 
+
+/* ---------- Balanced expanded recipe library ---------- */
+(function buildBalancedLibrary(){
+ const TARGET=1000, need=TARGET-RECIPES.length;
+ const bases=[
+  {id:"pasta",el:"Ζυμαρικά",en:"Pasta",q:320,u:"g",water:1800,kind:"boil",em:"🍝"},
+  {id:"rice",el:"Ρύζι",en:"Rice",q:280,u:"g",water:620,kind:"absorb",em:"🍚"},
+  {id:"orzo",el:"Κριθαράκι",en:"Orzo",q:300,u:"g",water:750,kind:"absorb",em:"🥘"},
+  {id:"potato",el:"Πατάτες",en:"Potatoes",q:700,u:"g",water:120,kind:"roast",em:"🥔"},
+  {id:"lentils",el:"Φακές",en:"Lentils",q:260,u:"g",water:1100,kind:"legume",em:"🥣"},
+  {id:"chickpeas",el:"Ρεβίθια",en:"Chickpeas",q:280,u:"g",water:900,kind:"legume",em:"🫘"},
+  {id:"white_beans",el:"Φασόλια",en:"White beans",q:280,u:"g",water:1000,kind:"legume",em:"🫘"},
+  {id:"black_eyed",el:"Μαυρομάτικα",en:"Black-eyed beans",q:280,u:"g",water:900,kind:"legume",em:"🫘"}
+ ];
+ const mains=[
+  {id:"chicken",el:"κοτόπουλο",en:"chicken",q:500,u:"g",type:"poultry",em:"🍗"},
+  {id:"beef",el:"μοσχάρι",en:"beef",q:500,u:"g",type:"meat",em:"🥩"},
+  {id:"pork",el:"χοιρινό",en:"pork",q:500,u:"g",type:"meat",em:"🥩"},
+  {id:"cod",el:"μπακαλιάρο",en:"cod",q:500,u:"g",type:"fish",em:"🐟"},
+  {id:"sardines",el:"σαρδέλες",en:"sardines",q:500,u:"g",type:"fish",em:"🐟"},
+  {id:"eggs",el:"αυγά",en:"eggs",q:4,u:"pc",type:"egg",em:"🍳"},
+  {id:"feta",el:"φέτα",en:"feta",q:220,u:"g",type:"dairy",em:"🧀"},
+  {id:"mushrooms",el:"μανιτάρια",en:"mushrooms",q:350,u:"g",type:"veg",em:"🍄"},
+  {id:"spinach",el:"σπανάκι",en:"spinach",q:400,u:"g",type:"veg",em:"🥬"},
+  {id:"zucchini",el:"κολοκυθάκια",en:"zucchini",q:450,u:"g",type:"veg",em:"🥒"},
+  {id:"eggplant",el:"μελιτζάνα",en:"eggplant",q:450,u:"g",type:"veg",em:"🍆"},
+  {id:"cauliflower",el:"κουνουπίδι",en:"cauliflower",q:500,u:"g",type:"veg",em:"🥦"}
+ ];
+ const accents=[
+  {id:"tomato",el:"ντομάτα",en:"tomato",q:3,u:"pc"},{id:"lemon",el:"λεμόνι",en:"lemon",q:1,u:"pc"},
+  {id:"peas",el:"αρακά",en:"peas",q:220,u:"g"},{id:"carrot",el:"καρότο",en:"carrot",q:2,u:"pc"},
+  {id:"spinach",el:"σπανάκι",en:"spinach",q:250,u:"g"},{id:"mushrooms",el:"μανιτάρια",en:"mushrooms",q:250,u:"g"},
+  {id:"zucchini",el:"κολοκυθάκια",en:"zucchini",q:300,u:"g"},{id:"eggplant",el:"μελιτζάνα",en:"eggplant",q:300,u:"g"},
+  {id:"feta",el:"φέτα",en:"feta",q:160,u:"g"},{id:"yogurt",el:"γιαούρτι",en:"yogurt",q:180,u:"g"}
+ ];
+ const styles=[
+  {id:"herb",el:"με μυρωδικά",en:"with herbs",extra:[["parsley",8,"g","o"],["oregano",2,"g","o"]]},
+  {id:"garlic",el:"με σκόρδο",en:"with garlic",extra:[["garlic",2,"pc","i"],["parsley",8,"g","o"]]},
+  {id:"tomato",el:"κοκκινιστό",en:"in tomato sauce",extra:[["canned_tomato",300,"g","i"],["oregano",2,"g","o"]]},
+  {id:"lemon",el:"λεμονάτο",en:"with lemon",extra:[["lemon",1,"pc","i"],["dill",8,"g","o"]]},
+  {id:"olive",el:"με ελιές",en:"with olives",extra:[["olives",100,"g","i"],["oregano",2,"g","o"]]}
+ ];
+ function title(b,m,a,s){return {el:`${b.el} με ${m.el}, ${a.el}, ${s.el}`,en:`${b.en} with ${m.en}, ${a.en}, ${s.en}`};}
+ function compatible(b,m,a,s){
+  if(m.id===a.id) return false;
+  if(a.id==="yogurt" && (m.type==="fish"||s.id==="tomato")) return false;
+  if(a.id==="feta" && m.id==="feta") return false;
+  if(s.id==="lemon" && a.id==="lemon") return false;
+  if(s.id==="tomato" && a.id==="tomato") return false;
+  if(b.kind==="legume" && m.type==="fish") return false;
+  return true;
+ }
+ function mainSteps(m){
+  if(m.type==="poultry") return {el:`Κόψε το ${m.el} σε ομοιόμορφα κομμάτια. Ρόδισέ το καλά και συνέχισε το μαγείρεμα μέχρι να έχει ψηθεί πλήρως στο κέντρο.`,en:`Cut the ${m.en} into even pieces. Brown it well and continue cooking until fully cooked through.`};
+  if(m.type==="meat") return {el:`Κόψε το ${m.el} σε μικρά κομμάτια και ρόδισέ το σε δόσεις. Σιγόβρασέ το μέχρι να μαλακώσει και να έχει ψηθεί πλήρως.`,en:`Cut the ${m.en} into small pieces and brown in batches. Simmer until tender and fully cooked.`};
+  if(m.type==="fish") return {el:`Στέγνωσε το ${m.el} και αφαίρεσε τυχόν κόκαλα. Πρόσθεσέ το προς το τέλος και μαγείρεψε απαλά μέχρι να γίνει αδιαφανές και να χωρίζεται εύκολα.`,en:`Pat the ${m.en} dry and remove any bones. Add it near the end and cook gently until opaque and easily flaked.`};
+  if(m.type==="egg") return {el:`Χτύπησε ελαφρά τα αυγά και πρόσθεσέ τα στο τέλος, ανακατεύοντας μέχρι να σταθεροποιηθούν πλήρως.`,en:`Beat the eggs lightly and add them near the end, stirring until fully set.`};
+  if(m.type==="dairy") return {el:`Θρυμμάτισε τη φέτα και πρόσθεσε τη μισή στο τέλος του μαγειρέματος. Κράτησε την υπόλοιπη για το σερβίρισμα.`,en:`Crumble the feta and add half near the end of cooking. Keep the rest for serving.`};
+  return {el:`Καθάρισε και κόψε τα ${m.el}. Σόταρέ τα μέχρι να μαλακώσουν και να πάρουν ελαφρύ χρώμα.`,en:`Clean and cut the ${m.en}. Sauté until tender and lightly coloured.`};
+ }
+ function baseSteps(b){
+  if(b.kind==="boil") return [[10,0,"Βράσε τα ζυμαρικά σε άφθονο αλατισμένο νερό σύμφωνα με τον χρόνο της συσκευασίας. Κράτησε λίγο νερό και στράγγισέ τα.","Boil the pasta in plenty of salted water for the package time. Reserve a little cooking water and drain."],[4,"M","Ένωσε τα ζυμαρικά με τη σάλτσα. Πρόσθεσε λίγο από το νερό τους μόνο αν χρειάζεται.","Combine the pasta with the sauce. Add a little reserved cooking water only if needed."]];
+  if(b.kind==="absorb") return [[3,"M",`Πρόσθεσε το ${b.el.toLowerCase()} και ανακάτεψε για να καλυφθεί με τα υλικά.`,`Add the ${b.en.toLowerCase()} and stir to coat.`],[20,"L","Πρόσθεσε το μετρημένο νερό, σκέπασε και σιγόβρασε μέχρι να μαλακώσει και να απορροφηθούν τα υγρά.","Add the measured water, cover and simmer until tender and the liquid is absorbed."]];
+  if(b.kind==="roast") return [[10,0,"Κόψε τις πατάτες σε ίσα κομμάτια και ανακάτεψέ τες με τα υπόλοιπα υλικά.","Cut the potatoes into even pieces and toss with the remaining ingredients."],[40,190,"Ψήσε μέχρι οι πατάτες να μαλακώσουν και να ροδίσουν. Ανακάτεψε μία φορά στη μέση.","Roast until the potatoes are tender and browned. Turn once halfway through."]];
+  return [[10,0,`Ξέπλυνε καλά τα ${b.el.toLowerCase()}. Αν είναι ξερά ρεβίθια ή φασόλια, μούλιασέ τα από το προηγούμενο βράδυ και στράγγισέ τα.`,`Rinse the ${b.en.toLowerCase()} well. If using dried chickpeas or beans, soak overnight and drain.`],[40,"L",`Σιγόβρασε τα ${b.el.toLowerCase()} στο μετρημένο νερό μέχρι να μαλακώσουν. Ο χρόνος εξαρτάται από το είδος και την ηλικία τους.`,`Simmer the ${b.en.toLowerCase()} in the measured water until tender. Timing depends on their type and age.`]];
+ }
+ function make(b,m,a,s,n){
+  const nm=title(b,m,a,s), oven=b.kind==="roast";
+  let ing=[[b.id,b.q,b.u,"c"],[m.id,m.q,m.u,"c"],[a.id,a.q,a.u,"i"],["onion",1,"pc","i"],["olive_oil",45,"ml","s"],["salt",5,"g","s"],["pepper_black",1,"g","s"],["water",b.water,"ml","s"]];
+  for(const x of s.extra) if(!ing.some(y=>y[0]===x[0])) ing.push([...x]);
+  const ms=mainSteps(m);
+  let st=[[10,0,`Ετοίμασε το ${m.el}, τη ${a.el} και ψιλόκοψε το κρεμμύδι.`,`Prepare the ${m.en} and ${a.en}, and finely chop the onion.`],[7,"M",ms.el,ms.en],[5,"M",`Πρόσθεσε τη ${a.el}, τα υλικά για ${s.el}, αλάτι και πιπέρι. Ανακάτεψε προσεκτικά.`,`Add the ${a.en}, the ingredients for ${s.en}, salt and pepper. Stir gently.`],...baseSteps(b),[3,0,"Δοκίμασε, διόρθωσε το αλάτι και άφησε το φαγητό να σταθεί λίγο πριν το σερβίρισμα.","Taste, adjust the seasoning and let the dish rest briefly before serving."]];
+  return {id:`balanced_${String(n).padStart(4,"0")}_${b.id}_${m.id}_${a.id}_${s.id}`,em:m.em||b.em,el:nm.el,en:nm.en,del:`Ισορροπημένη συνταγή με ${b.el.toLowerCase()}, ${m.el} και ${a.el}.`,den:`A balanced recipe with ${b.en.toLowerCase()}, ${m.en} and ${a.en}.`,sv:4,dif:oven?2:1,g:0,ing,st};
+ }
+ let cand=[];
+ for(let bi=0;bi<bases.length;bi++)for(let mi=0;mi<mains.length;mi++)for(let ai=0;ai<accents.length;ai++)for(let si=0;si<styles.length;si++){
+  const b=bases[bi],m=mains[mi],a=accents[ai],s=styles[si]; if(!compatible(b,m,a,s))continue;
+  cand.push({b,m,a,s,rank:(bi*97+mi*53+ai*29+si*17)%997,bi,mi,ai,si});
+ }
+ cand.sort((x,y)=>x.rank-y.rank||x.bi-y.bi||x.mi-y.mi||x.ai-y.ai||x.si-y.si);
+ const usedTitle=new Set(RECIPES.flatMap(r=>[r.en.toLowerCase(),r.el.toLowerCase()]));
+ const usedSig=new Set(); let added=0;
+ for(const c of cand){ if(added>=need)break; const r=make(c.b,c.m,c.a,c.s,added+1); const sig=r.ing.map(x=>`${x[0]}:${x[1]}:${x[2]}`).sort().join("|");
+  if(usedTitle.has(r.en.toLowerCase())||usedTitle.has(r.el.toLowerCase())||usedSig.has(sig))continue;
+  R(r); usedTitle.add(r.en.toLowerCase());usedTitle.add(r.el.toLowerCase());usedSig.add(sig);added++;
+ }
+ if(RECIPES.length!==TARGET)throw new Error(`Expected ${TARGET} recipes, created ${RECIPES.length}`);
+})();
+
 /* ---------- Derived recipe data ---------- */
 const isOven=h=>typeof h==="number"&&h>0;
 function gramsOf(id,q,u){ const d=INGM[id]; if(!d) return 0; if(u==="g") return q; if(u==="ml") return q*d.dens; return q*(d.pw||0); }
