@@ -172,7 +172,7 @@ h2.sec.terra{color:var(--terra)}
 
 <script>
 "use strict";
-const VERSION = "1.9";
+const VERSION = "2.0";
 
 /* ---------- Storage (browser only, on this device) ---------- */
 const LS = {
@@ -502,6 +502,14 @@ R({id:"makaronia_kima",em:"🍝",el:"Μακαρόνια με κιμά",en:"Spagh
   [35,"L","Σιγόβρασε μέχρι να δέσει η σάλτσα.","Simmer until the sauce thickens."],
   [10,"H","Στο μεταξύ βράσε τα μακαρόνια σε 3 λίτρα νερό με το υπόλοιπο αλάτι και στράγγιξε.","Meanwhile boil the pasta in 3 litres of water with the remaining salt and drain.",1],
   [1,0,"Σέρβιρε με τριμμένο τυρί.","Serve with grated cheese."]]});
+
+R({id:"makaronia_ntomata",em:"🍝",el:"Μακαρόνια με ντομάτα",en:"Pasta with fresh tomato sauce",del:"Ελαφριά μακαρονάδα με φρέσκια ντομάτα και κρεμμύδι.",den:"Light pasta with fresh tomato and onion sauce.",sv:4,dif:1,g:1,
+ ing:[["pasta",400,"g","c"],["tomato",5,"pc","c"],["onion",1,"pc","i"],["garlic",1,"pc","o"],["tomato_paste",15,"g","o"],["oregano",1,"g","o"],["olive_oil",35,"ml","s"],["salt",7,"g","s"],["pepper_black",1,"g","s"],["water",2500,"ml","s"]],
+ st:[[5,0,"Ψιλόκοψε το κρεμμύδι, το σκόρδο και τις ντομάτες.","Finely chop the onion, garlic and tomatoes."],
+  [5,"M","Σόταρε το κρεμμύδι στο μισό ελαιόλαδο μέχρι να μαλακώσει.","Sauté the onion in half the olive oil until soft."],
+  [15,"L","Πρόσθεσε τη ντομάτα, προαιρετικά το σκόρδο και τον πελτέ, αλάτι, πιπέρι και ρίγανη. Σιγόβρασε μέχρι να δέσει η σάλτσα.","Add the tomato, optional garlic and tomato paste, salt, pepper and oregano. Simmer until the sauce thickens."],
+  [10,"H","Βράσε τα μακαρόνια στο νερό, κράτησε λίγο νερό βρασίματος και στράγγισε.","Boil the pasta in the water, reserve a little cooking water and drain.",1],
+  [2,"M","Ανακάτεψε τα μακαρόνια με τη σάλτσα και το υπόλοιπο ελαιόλαδο. Πρόσθεσε λίγο νερό βρασίματος αν χρειάζεται.","Toss the pasta with the sauce and remaining olive oil. Add a little pasta water if needed."]]});
 
 R({id:"giouvetsi",em:"🥘",el:"Γιουβέτσι κοτόπουλο",en:"Chicken giouvetsi",del:"Κοτόπουλο με κριθαράκι στον φούρνο.",den:"Baked chicken with orzo.",sv:4,dif:2,g:1,
  ing:[["chicken",700,"g","c"],["orzo",400,"g","c"],["canned_tomato",400,"g","i"],["onion",1,"pc","i"],["cheese_hard",60,"g","o"],["cinnamon",1,"g","o"],["olive_oil",60,"ml","s"],["salt",9,"g","s"],["pepper_black",1,"g","s"],["water",1000,"ml","s"]],
@@ -841,13 +849,13 @@ R({id:"dolmadakia",em:"🍃",el:"Ντολμαδάκια γιαλαντζί",en:"
   [15,0,"Άφησε να κρυώσουν και σέρβιρε με τον χυμό του δεύτερου λεμονιού.","Let them cool and serve with the juice of the second lemon."]]});
 
 R({id:"imam",em:"🍆",el:"Ιμάμ μπαϊλντί",en:"Stuffed eggplant (Imam bayildi)",del:"Μελιτζάνες γεμιστές με κρεμμύδια και ντομάτα.",den:"Eggplants stuffed with onions and tomato.",sv:4,dif:2,g:1,
- ing:[["eggplant",4,"pc","c"],["onion",3,"pc","i"],["tomato",4,"pc","i"],["garlic",4,"pc","i"],["parsley",20,"g","o"],["olive_oil",150,"ml","s"],["salt",8,"g","s"],["pepper_black",1,"g","s"]],
+ ing:[["eggplant",4,"pc","c"],["onion",3,"pc","i"],["tomato",4,"pc","i"],["garlic",4,"pc","i"],["feta",150,"g","i"],["parsley",20,"g","o"],["olive_oil",150,"ml","s"],["salt",8,"g","s"],["pepper_black",1,"g","s"]],
  st:[[20,0,"Κόψε τις μελιτζάνες στη μέση κατά μήκος, χάραξε τη σάρκα, αλάτισε και άφησε να βγάλουν τα υγρά τους. Ξέπλυνε και στέγνωσε.","Halve the eggplants lengthwise, score the flesh, salt them and let them release their liquid. Rinse and dry."],
   [12,"M","Τηγάνισε τις μελιτζάνες στο μισό ελαιόλαδο, 6 λεπτά από κάθε πλευρά.","Fry the eggplants in half the olive oil, 6 minutes per side."],
   [10,"M","Σοτάρισε τα κρεμμύδια σε λεπτές φέτες και το σκόρδο στο υπόλοιπο ελαιόλαδο.","Sauté the thinly sliced onions and the garlic in the remaining olive oil."],
   [10,"L","Πρόσθεσε τις ντομάτες σε κυβάκια, τον μαϊντανό και το πιπέρι και σιγόβρασε.","Add the diced tomatoes, parsley and pepper and simmer."],
   [5,0,"Άνοιξε τις μελιτζάνες σε ταψί και γέμισέ τες με τη σάλτσα.","Open the eggplants in a tray and fill them with the sauce."],
-  [40,180,"Ψήσε μέχρι να μαλακώσουν εντελώς.","Bake until completely soft."]]});
+  [40,180,"Ψήσε μέχρι να μαλακώσουν εντελώς. Σέρβιρε με τη φέτα θρυμματισμένη από πάνω.","Bake until completely soft. Serve with the feta crumbled on top."]]});
 
 R({id:"saganaki",em:"🧀",el:"Σαγανάκι τυρί",en:"Fried cheese (Saganaki)",del:"Τηγανητή κεφαλογραβιέρα με λεμόνι.",den:"Pan-fried hard cheese with lemon.",sv:2,dif:1,g:1,
  ing:[["cheese_hard",250,"g","c"],["flour",30,"g","i",.5],["lemon",1,"pc","i"],["olive_oil",50,"ml","s",.3]],
@@ -1090,6 +1098,7 @@ const endsSep=()=>/[,;\n·]\s*$/.test(S.text)||!S.text.trim();
 
 /* ---------- Matching algorithm ---------- */
 const W = {c:5,i:3,s:0};
+const DEFAULT_STAPLES = ["salt","pepper_black","olive_oil"];
 function has(id){ return id==="water" || S.selected.has(id); }
 function subFor(id){ return (SUBS[id]||[]).find(x=>has(x)); }
 function recentlyCooked(id){ const wk=7*864e5; return S.history.some(h=>h.id===id && Date.now()-h.at<wk); }
@@ -1122,15 +1131,18 @@ function evaluate(r){
   }
   const C=den?num/den:0;
   const used=r.ing.filter(x=>S.selected.has(x[0])).length;
-  const P=S.selected.size?Math.min(1,used/S.selected.size):0;
+  const meaningfulSelected=[...S.selected].filter(id=>!DEFAULT_STAPLES.includes(id));
+  const usedMeaningful=new Set(r.ing.filter(x=>x[3]!=="s"&&meaningfulSelected.includes(x[0])).map(x=>x[0])).size;
+  const P=meaningfulSelected.length?Math.min(1,usedMeaningful/meaningfulSelected.length):0;
   const T_=timeFit(r.total), V=recentlyCooked(r.id)?0:1;
-  const score=.60*C+.17*P+.10*r.g+.08*T_+.05*V;
+  /* Relevance now balances recipe completeness with how many deliberate selections it uses. */
+  const score=.42*C+.43*P+.08*r.g+.04*T_+.03*V;
   const coreOwned=r.ing.some(x=>x[3]==="c"&&(S.selected.has(x[0])||subFor(x[0])));
   let group="idea";
   if(mc===0&&mi===0&&used>0) group="now";
   else if(mc+mi<=2&&mc<=1&&C>=.5&&coreOwned) group="almost";
   else if(used>0) group="other";
-  return {r,C,P,score,group,missing,missKey,subs,used,match:Math.round(C*100)};
+  return {r,C,P,score,group,missing,missKey,subs,used,usedMeaningful,match:Math.round((.65*C+.35*P)*100)};
 }
 const MIN_RESULTS=4;
 function results(){
@@ -1436,7 +1448,14 @@ function speak(){
 }
 
 /* ---------- Start on the ingredient screen (Mockup #1) ---------- */
-["selected","staples"].forEach(k=>{ try{ localStorage.removeItem("wtc_"+k); }catch(e){} });
+/* v2 migration: salt, black pepper and olive oil start selected once, then remain fully user-controlled. */
+if(!LS.get("staples_v2",false)){
+  const defaults=S.lang==="el"?["Αλάτι","Πιπέρι","Ελαιόλαδο"]:["Salt","Black pepper","Olive oil"];
+  const existing=splitText(S.text).map(matchIng).filter(Boolean);
+  const add=defaults.filter((_,i)=>!existing.includes(DEFAULT_STAPLES[i]));
+  S.text=[S.text.trim(),...add].filter(Boolean).join(", ");
+  LS.set("staples_v2",true);
+}
 setText(S.text);
 S.screen="ing";
 render();
