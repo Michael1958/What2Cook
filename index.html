@@ -172,7 +172,7 @@ h2.sec.terra{color:var(--terra)}
 
 <script>
 "use strict";
-const VERSION = "2.0";
+const VERSION = "2.1";
 
 /* ---------- Storage (browser only, on this device) ---------- */
 const LS = {
@@ -397,7 +397,7 @@ Object.entries(EXTRA_AL).forEach(([id,a])=>INGM[id].al.push(...a));
 
 /* Ingredient swaps used when an ingredient is missing */
 const SUBS = {lemon:["vinegar"],feta:["cheese_hard"],cheese_hard:["feta"],canned_tomato:["tomato"],tomato:["canned_tomato"],tomato_paste:["canned_tomato"],
-  spring_onion:["onion"],onion:["spring_onion"],dill:["parsley"],parsley:["dill"],mint:["parsley"],orzo:["pasta","rice"],pasta:["orzo"],
+  spring_onion:["onion"],onion:["spring_onion"],dill:["parsley"],parsley:["dill"],mint:["parsley"],
   butter:["olive_oil"],horta:["spinach"],spinach:["horta"],rusk:["bread"],beef:["pork"],pork:["beef"],sardines:["cod"],milk:["yogurt"]};
 
 /* ---------- Recipes ----------
@@ -785,6 +785,14 @@ R({id:"kotopoulo_hilopites",em:"🍗",el:"Κοτόπουλο με χυλοπίτ
   [12,"M","Βγάλε το κοτόπουλο, ρίξε τις χυλοπίτες και 500 ml ζεστό νερό και μαγείρεψε ανακατεύοντας μέχρι να μαλακώσουν.","Remove the chicken, add the noodles and 500 ml hot water and cook, stirring, until soft."],
   [1,0,"Σέρβιρε με το κοτόπουλο και τριμμένο τυρί.","Serve with the chicken and grated cheese."]]});
 
+R({id:"ntomatosoupa_pasta",em:"🍅",el:"Ντοματόσουπα με μακαρόνια",en:"Tomato soup with pasta",del:"Ζεστή ντοματόσουπα με μικρά μακαρόνια, κρεμμύδι και ελαιόλαδο.",den:"Warming tomato soup with small pasta, onion and olive oil.",sv:4,dif:1,g:1,
+ ing:[["tomato",6,"pc","c"],["pasta",120,"g","c"],["onion",1,"pc","i"],["tomato_paste",20,"g","o"],["olive_oil",50,"ml","s"],["salt",6,"g","s"],["pepper_black",1,"g","s"],["water",1200,"ml","s"]],
+ st:[[10,0,"Τρίψε τις ντομάτες, ψιλόκοψε το κρεμμύδι και σπάσε τα μακαρόνια σε μικρά κομμάτια αν χρησιμοποιείς σπαγγέτι.","Grate the tomatoes, chop the onion and break the pasta into small pieces if using spaghetti."],
+  [5,"M","Σόταρε το κρεμμύδι στο ελαιόλαδο μέχρι να μαλακώσει.","Sauté the onion in the olive oil until soft."],
+  [3,"H","Πρόσθεσε τις ντομάτες, προαιρετικά τον πελτέ, το νερό, το αλάτι και το πιπέρι και φέρε σε βρασμό.","Add the tomatoes, optional tomato paste, water, salt and pepper and bring to the boil."],
+  [10,"L","Σιγόβρασε για να δέσουν οι γεύσεις.","Simmer to develop the flavours."],
+  [10,"M","Πρόσθεσε τα μακαρόνια και μαγείρεψε ανακατεύοντας μέχρι να γίνουν al dente. Πρόσθεσε λίγο ζεστό νερό αν η σούπα πήξει πολύ.","Add the pasta and cook, stirring, until al dente. Add a little hot water if the soup becomes too thick."]]});
+
 R({id:"ntomatosoupa",em:"🍅",el:"Ντοματόσουπα με κριθαράκι",en:"Tomato soup with orzo",del:"Ζεστή σούπα με φρέσκια ντομάτα και κριθαράκι.",den:"Warming fresh tomato soup with orzo.",sv:4,dif:1,g:1,
  ing:[["tomato",6,"pc","c"],["orzo",120,"g","c"],["onion",1,"pc","i"],["tomato_paste",20,"g","o"],["feta",80,"g","o"],["olive_oil",50,"ml","s"],["salt",6,"g","s"],["pepper_black",1,"g","s"],["water",1200,"ml","s"]],
  st:[[10,0,"Τρίψε τις ντομάτες και ψιλόκοψε το κρεμμύδι.","Grate the tomatoes and chop the onion."],
@@ -1136,13 +1144,14 @@ function evaluate(r){
   const P=meaningfulSelected.length?Math.min(1,usedMeaningful/meaningfulSelected.length):0;
   const T_=timeFit(r.total), V=recentlyCooked(r.id)?0:1;
   /* Relevance now balances recipe completeness with how many deliberate selections it uses. */
-  const score=.42*C+.43*P+.08*r.g+.04*T_+.03*V;
+  const corePenalty=mc*.12;
+  const score=.38*C+.49*P+.07*r.g+.04*T_+.02*V-corePenalty;
   const coreOwned=r.ing.some(x=>x[3]==="c"&&(S.selected.has(x[0])||subFor(x[0])));
   let group="idea";
   if(mc===0&&mi===0&&used>0) group="now";
   else if(mc+mi<=2&&mc<=1&&C>=.5&&coreOwned) group="almost";
   else if(used>0) group="other";
-  return {r,C,P,score,group,missing,missKey,subs,used,usedMeaningful,match:Math.round((.65*C+.35*P)*100)};
+  return {r,C,P,score,group,missing,missKey,subs,used,usedMeaningful,match:Math.max(0,Math.round((.55*C+.45*P-mc*.08)*100))};
 }
 const MIN_RESULTS=4;
 function results(){
@@ -1448,13 +1457,13 @@ function speak(){
 }
 
 /* ---------- Start on the ingredient screen (Mockup #1) ---------- */
-/* v2 migration: salt, black pepper and olive oil start selected once, then remain fully user-controlled. */
-if(!LS.get("staples_v2",false)){
+/* First-use defaults: salt, black pepper and olive oil are selected, but every item remains removable. */
+if(!LS.get("staples_v21",false)){
   const defaults=S.lang==="el"?["Αλάτι","Πιπέρι","Ελαιόλαδο"]:["Salt","Black pepper","Olive oil"];
   const existing=splitText(S.text).map(matchIng).filter(Boolean);
   const add=defaults.filter((_,i)=>!existing.includes(DEFAULT_STAPLES[i]));
   S.text=[S.text.trim(),...add].filter(Boolean).join(", ");
-  LS.set("staples_v2",true);
+  LS.set("staples_v21",true);
 }
 setText(S.text);
 S.screen="ing";
